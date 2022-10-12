@@ -15,7 +15,6 @@ transporter.py
 /config/hadashboards/
 /config/intents/
 /config/themes/
-/config/custom_components
 /config/deps
 /config/hacs
 /config/zigbee2mqtt/
