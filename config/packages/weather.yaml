@@ -1,0 +1,20 @@
+# longitude and latitude is set in the default homeassistant configuration
+
+weather:
+  - platform: environment_canada
+    
+
+sensor:
+  - platform: environment_canada
+    scan_interval:
+      minutes: 10
+
+camera:
+  - platform: environment_canada
+    name: "Southwestern Ontario meteogram"
+  
+# weather_alert_tts:
+#   sequence:
+#     - service: tts.amazon_polly_say
+#       data:
+#         message: "{{ states('sensor.warnings') }} in effect."

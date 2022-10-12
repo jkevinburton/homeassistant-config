@@ -1,0 +1,63 @@
+mqtt:
+  cover:
+    - name: "Garage Door"
+      command_topic: "cmnd/garage/door/POWER"
+      state_topic: "stat/garage/door/status"
+      availability_topic: "tele/garage/door/LWT"
+      qos: 1
+      payload_available: "Online"
+      payload_not_available: "Offline"
+      payload_open: "ON"
+      payload_close: "ON"
+      payload_stop: "ON"
+      state_open: "open"
+      state_closed: "closed"
+      device_class: garage
+
+  binary_sensor:
+    - name: "Garage Door State"
+      state_topic: "stat/garage/door/status"
+      payload_on: "open"
+      payload_off: "closed"
+      availability_topic: "tele/garage/door/LWT"
+      payload_available: "Online"
+      payload_not_available: "Offline"
+      qos: 1
+      device_class: garage_door
+
+input_boolean:
+  # door alerts
+  alerts_door_garage:
+    name: Garage Door Alert
+    icon: mdi:bullhorn
+
+automation:
+  - id: garage_door_left_open_automation
+    alias: Alert when garage door is still open
+    description: "Send a notification when the garage door has been left open for too long"
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.garage_door_state
+        to: "on"
+        for: "00:05:00"
+        from: "off"
+      - platform: state
+        entity_id: binary_sensor.garage_door_state
+        to: "on"
+        for: "00:15:00"
+        from: "off"
+      - platform: state
+        entity_id: binary_sensor.garage_door_state
+        to: "on"
+        for: "00:30:00"
+        from: "off"
+    condition:
+      - condition: state
+        entity_id: input_boolean.alerts_door_garage
+        state: "on"
+    action:
+      - service: script.text_notify
+        data_template:
+          who: "kevin"
+          message: >-
+            Garage door left open {% if trigger.id is defined %}{{ ('5','15','30')[trigger.id|int] }}{%- endif %} minutes

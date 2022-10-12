@@ -1,0 +1,224 @@
+# ADT/Telus Integration
+# alarm_control_panel:
+#   # uses the custom alarmdotcom integration found in HACS
+#   - platform: alarmdotcom
+#     name: alarm_com
+#     username: !secret alarm_user
+#     password: !secret alarm_password
+#     silent_arming: "false"
+#     code: !secret alarm_code
+#     adt: true
+
+input_boolean:
+  # when the whole system is armed
+  sentry_mode:
+    name: Sentry Mode
+    icon: mdi:security
+
+  alerts_house_doorbell:
+    name: Doorbell Alert
+    icon: mdi:bullhorn
+
+mqtt:
+  sensor:
+    - name: Front Door Motion Away Count
+      state_topic: "tele/house/front_door_motion/away_count"
+    - name: Back Deck Motion Away Count
+      state_topic: "tele/house/back_deck_motion/away_count"
+
+# binary_sensor:
+#   - platform: template
+#     sensors:
+#       alarm_basement_bathroom_window:
+#         friendly_name: "Powder Room Window"
+#         device_class: window
+#         value_template: "{{ state_attr('alarm_control_panel.alarm_com', 'sensor_status')|regex_search('Basement Bathroom Window is Open', ignorecase=True) }}"
+#       alarm_eating_nook_window:
+#         friendly_name: "Eating Nook Window"
+#         device_class: window
+#         value_template: "{{ state_attr('alarm_control_panel.alarm_com', 'sensor_status')|regex_search('Eating Nook Window is Open', ignorecase=True) }}"
+#       alarm_family_room_back_window:
+#         friendly_name: "Family Room Back Window"
+#         device_class: window
+#         value_template: "{{ state_attr('alarm_control_panel.alarm_com', 'sensor_status')|regex_search('Family Room Back Window is Open', ignorecase=True) }}"
+#       alarm_family_room_side_window:
+#         friendly_name: "Family Room Side Window"
+#         device_class: window
+#         value_template: "{{ state_attr('alarm_control_panel.alarm_com', 'sensor_status')|regex_search('Family Room Side Window is Open', ignorecase=True) }}"
+#       alarm_front_door:
+#         friendly_name: "Front Door"
+#         device_class: door
+#         value_template: "{{ state_attr('alarm_control_panel.alarm_com', 'sensor_status')|regex_search('Front Door is Open', ignorecase=True) }}"
+#       alarm_good_room_left_window:
+#         friendly_name: "Good Room Left Window"
+#         device_class: window
+#         value_template: "{{ state_attr('alarm_control_panel.alarm_com', 'sensor_status')|regex_search('Good Room Window Left is Open', ignorecase=True) }}"
+#       alarm_good_room_right_window:
+#         friendly_name: "Good Room Right Window"
+#         device_class: window
+#         value_template: "{{ state_attr('alarm_control_panel.alarm_com', 'sensor_status')|regex_search('Good Room Window Right is Open', ignorecase=True) }}"
+#       alarm_keaton_bedroom_window:
+#         friendly_name: "Keaton Bedroom Window"
+#         device_class: window
+#         value_template: "{{ state_attr('alarm_control_panel.alarm_com', 'sensor_status')|regex_search('Keaton Bedroom Window is Open', ignorecase=True) }}"
+#       alarm_kitchen_window:
+#         friendly_name: "Kitchen Sink Window"
+#         device_class: window
+#         value_template: "{{ state_attr('alarm_control_panel.alarm_com', 'sensor_status')|regex_search('Kitchen Window is Open', ignorecase=True) }}"
+#       alarm_side_door:
+#         friendly_name: "Side Door"
+#         device_class: door
+#         value_template: "{{ state_attr('alarm_control_panel.alarm_com', 'sensor_status')|regex_search('Side Door is Open', ignorecase=True) }}"
+
+script:
+  arm_home_alarm:
+    sequence:
+      - service: alarm_control_panel.alarm_arm_home
+        target:
+          entity_id: alarm_control_panel.alarm_com
+        data:
+          code: !secret alarm_code
+
+  disarm_home_alarm:
+    sequence:
+      - service: alarm_control_panel.alarm_disarm
+        target:
+          entity_id: alarm_control_panel.alarm_com
+        data:
+          code: !secret alarm_code
+
+  reset_away_counts:
+    sequence:
+      - service: mqtt.publish
+        data:
+          topic: tele/house/front_door_motion/away_count
+          payload_template: 0
+          retain: true
+      - service: mqtt.publish
+        data:
+          topic: tele/house/back_deck_motion/away_count
+          payload_template: 0
+          retain: true
+
+  update_front_door_motion_away_count:
+    sequence:
+      - service: mqtt.publish
+        data:
+          topic: tele/house/front_door_motion/away_count
+          payload_template: "{{ states.front_door_motion_away_count.state | int  +1 }}"
+          retain: true
+
+  update_back_deck_motion_count:
+    sequence:
+      - service: mqtt.publish
+        data:
+          topic: tele/house/back_deck_motion/away_count
+          payload_template: "{{ states.back_deck_motion_away_count.state | int  +1 }}"
+          retain: true
+
+automation:
+  #############################################
+  - id: sentry_mode_was_enabled
+    alias: Sentry Mode was Enabled
+    initial_state: true
+    trigger:
+      - platform: state
+        entity_id: input_boolean.sentry_mode
+        from: "off"
+        to: "on"
+    action:
+      - service: script.arm_home_alarm
+      - service: script.reset_away_counts
+      - service: script.text_notify
+        data:
+          who: "parents"
+          message: "I have armed the house for you! Good night everyone."
+
+  - id: sentry_mode_was_disabled
+    alias: Sentry Mode was Disabled
+    initial_state: true
+    trigger:
+      - platform: state
+        entity_id: input_boolean.sentry_mode
+        from: "on"
+        to: "off"
+    action:
+      - service: script.disarm_home_alarm
+      - service: script.text_notify
+        data:
+          who: "parents"
+          message: "Good morning, I have disarmed the house for you.  If only I could make the coffee too. Just kidding, have a great day."
+
+  # // automatically arm the house at 10:30pm
+  - id: nightly_lockdown
+    alias: Nightly Lockdown
+    initial_state: true
+    trigger:
+      - platform: time
+        at: "22:30:00"
+    condition:
+      - condition: state
+        entity_id: input_boolean.sentry_mode
+        state: "off"
+    action:
+      - service: input_boolean.turn_on
+        entity_id: input_boolean.sentry_mode
+
+  # // automatically disarm the house at 7:00am
+  - id: morning_standby
+    alias: Morning Standby
+    initial_state: true
+    trigger:
+      - platform: time
+        at: "06:30:00"
+    condition:
+      - condition: state
+        entity_id: input_boolean.sentry_mode
+        state: "on"
+    action:
+      - service: input_boolean.turn_off
+        entity_id: input_boolean.sentry_mode
+
+  # // motion detected at the front door
+  - id: motion_detected_at_front_door
+    alias: Motion Detected at Front Door
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.uvc_doorbell_motion
+        from: "off"
+        to: "on"
+    condition:
+      - condition: state
+        entity_id: input_boolean.sentry_mode
+        state: "on"
+    action:
+      - service: script.update_front_door_motion_away_count
+    initial_state: true
+
+  # // motion detected at the front door
+  - id: motion_detected_at_back_deck
+    alias: Motion Detected at Back Deck
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.uvc_back_deck_motion
+        from: "off"
+        to: "on"
+    condition:
+      - condition: state
+        entity_id: input_boolean.sentry_mode
+        state: "on"
+    action:
+      - service: script.update_back_deck_motion_count
+    initial_state: true
+
+  # - id: "1649887882852"
+  #   alias: Save a camera snapshot when motion is detected at the front door
+  #   description: ""
+  #   use_blueprint:
+  #     path: homeassistant/motion_sensor_snapshot.yaml
+  #     input:
+  #       archive_file: '/config/www/images/security/archive/motion_{{ now().strftime("%Y%m%d-%H%M%S") }}.jpg'
+  #       motion_sensor: binary_sensor.uvc_doorbell_motion
+  #       camera: camera.uvc_doorbell_high
+  #       file: "/config/www/images/security/archive/motion_doorbell_detected.jpg"
+  #       delay: 1

@@ -1,0 +1,8 @@
+sensor:
+  # One entry for each beacon you want to track
+  - platform: mqtt_room
+    device_id: "apple:1006:10-7"
+    name: "Kevin iPhone 12 Mini BLE"
+    state_topic: "espresense/rooms"
+    timeout: 60
+    away_timeout: 120 # number of seconds after which the enitity will get status not_home

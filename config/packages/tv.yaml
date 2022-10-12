@@ -1,0 +1,92 @@
+input_datetime:
+  family_room_time:
+    name: TV Time ON
+    has_date: false
+    has_time: true
+
+template:
+  - binary_sensor:
+      - name: "Family Room TV Status"
+        state: "{{ is_state('remote.remote.58_hisense_roku_tv', 'on') }}"
+        icon: mdi:television
+
+automation:
+  # ------------------------------------------------------------
+  # Turn ON the TV LEDs when the TV turns ON
+  # ------------------------------------------------------------
+  - id: turn_on_leds_when_tv_turns_on
+    alias: Turn On TV Ambient Lights
+    initial_state: true
+    trigger:
+      - platform: state
+        entity_id: remote.58_hisense_roku_tv
+        from: "off"
+        to: "on"
+    condition:
+      alias: "is evening and ambient is not on"
+      and:
+        - condition: state
+          entity_id: binary_sensor.evening
+          state: "on"
+        - condition: state
+          entity_id: switch.zigbee_light_bars
+          state: "off"
+    action:
+      - service: script.turn_on_tv_ambient
+      - service: script.turn_on_lamp
+
+  # ------------------------------------------------------------
+  # Turn OFF the TV LEDs when the TV turns OFF
+  # ------------------------------------------------------------
+  - id: turn_off_leds_when_tv_turns_off
+    alias: Turn Off TV Ambient Lights
+    initial_state: true
+    trigger:
+      - platform: state
+        entity_id: remote.58_hisense_roku_tv
+        from: "on"
+        to: "off"
+    condition:
+      - condition: state
+        entity_id: switch.zigbee_light_bars
+        state: "on"
+    action:
+      - service: script.turn_off_tv_ambient
+  # ------------------------------------------------------------
+  # on input_datetime.family_room_time and the lamp is off, and the TV is ON, turn on lamp.
+  # ------------------------------------------------------------
+
+  - id: turn_on_leds_if_tv_is_on_and_led_are_off_at_tv_time
+    alias: Turn ON LEDS at TV Time if TV is ON and LEDs are OFF
+    initial_state: true
+    trigger:
+      - platform: time
+        at: input_datetime.family_room_time
+    condition:
+      alias: "is time and tv is on and leds are off"
+      and:
+        - condition: state
+          entity_id: remote.58_hisense_roku_tv
+          state: "on"
+        - condition: state
+          entity_id: switch.zigbee_light_bars
+          state: "off"
+    action:
+      - service: script.turn_on_tv_ambient
+
+script:
+  turn_off_tv_ambient:
+    sequence:
+      - service: switch.turn_off
+        entity_id: switch.zigbee_light_bars
+  turn_on_tv_ambient:
+    sequence:
+      - service: switch.turn_on
+        entity_id: switch.zigbee_light_bars
+  turn_on_lamp:
+    sequence:
+      - condition: state
+        entity_id: light.family_room_lamp
+        state: "off"
+      - service: light.turn_on
+        entity_id: light.family_room_lamp

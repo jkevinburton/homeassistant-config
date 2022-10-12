@@ -1,0 +1,54 @@
+recorder:
+  #db_url: !secret database
+  purge_keep_days: 1
+  exclude:
+    domains:
+      - automation
+      - weblink
+      - updater
+    entities:
+      - sun.sun # Don't record sun data
+      - sensor.last_boot # Comes from 'systemmonitor' sensor platform
+      - sensor.date
+
+logbook:
+  include:
+    domains:
+      - media_player
+      - automation
+      - script
+      - scene
+      - light
+      - switch
+
+# Lets try to make the logs less chatty and more fine tuned.
+logger:
+  default: error
+  logs:
+    homeassistant.core: warning
+    homeassistant.loader: error
+    homeassistant.components.recorder: error # to spot db issues
+    homeassistant.config_entries: error
+    homeassistant.setup: error
+    homeassistant.components.roku: critical
+    homeassistant.helpers.entity: critical
+    homeassistant.components.automation: error
+    homeassistant.components.tplink: error
+    homeassistant.components.waze_travel_time: error
+    homeassistant.components.statistics.sensor: critical
+    homeassistant.components.nws: error
+    homeassistant.components.wemo: error
+    homeassistant.helpers.event: critical
+    bellows: error
+    zigpy: error
+    homeassistant.components.zha.core: error
+
+history:
+  include:
+    domains:
+      - sensor
+      - switch
+      - media_player
+      - light
+      - scene
+      - automation

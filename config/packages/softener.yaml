@@ -1,0 +1,47 @@
+sensor:
+  - platform: template
+    sensors:
+      water_softener_status:
+        friendly_name: "Water Softener Status"
+        value_template: >-
+          {% if states('sensor.ultrasonic_sensor') | float > 0.40 %}
+            Low
+          {% elif states('sensor.ultrasonic_sensor') | float > 0.30 %}
+            Good
+          {% elif states('sensor.ultrasonic_sensor') | float > 0.20 %}
+            Full
+          {% else %}
+            Error
+          {% endif %}
+
+input_boolean:
+  alert_low_salt:
+    name: Low Salt in Softener Alert
+    icon: mdi:bullhorn
+
+script:
+  # // water softener needs to be filled
+  water_softener_low:
+    sequence:
+      - service: script.text_notify
+        data_template:
+          who: "parents"
+          message: "Looks like the water softener is running low in salt, consider adding some more... trust me."
+
+automation:
+  # -----------------------------------------------------------
+  - id: notify_when_water_softener_is_low
+    alias: Water softener is getting low
+    trigger:
+      - platform: state
+        entity_id: sensor.water_softener_status
+        from: "Good"
+        to: "Low"
+        for: "00:05:00"
+    condition:
+      - condition: state
+        entity_id: input_boolean.alert_low_salt
+        state: "on"
+    action:
+      - service: script.water_softener_low
+    initial_state: true

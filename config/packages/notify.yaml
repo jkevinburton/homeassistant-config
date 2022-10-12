@@ -1,0 +1,253 @@
+# // Alexa sounds
+# // https://github.com/custom-components/alexa_media_player/wiki#examples-1
+
+binary_sensor:
+  - platform: tod
+    name: Quiet time
+    after: "22:00"
+    before: "06:00"
+
+sensor:
+  - platform: template
+    sensors:
+      last_alexa:
+        friendly_name: Last Alexa Used
+        value_template: >
+          {{ states.media_player | selectattr('attributes.last_called','eq',True) | map(attribute='entity_id') | first }}
+
+# ========================================================
+# KILL SWITCHES
+# ========================================================
+
+input_boolean:
+  audible_notifications:
+    name: Audible Notifications
+    icon: mdi:speaker-wireless
+
+  # // ability to stop all text notifications
+  text_notifications:
+    name: Text Notifications
+    icon: mdi:text-box
+
+# ========================================================
+# NOTIFICATION GROUPS
+# ========================================================
+
+notify:
+  - name: family_ios
+    platform: group
+    services:
+      - service: mobile_app_jkevinburton_iphone12mini
+      - service: mobile_app_tamaras_iphone
+      - service: mobile_app_denver_denvers_iphone_7
+      - service: mobile_app_iphone
+  - name: denver_ios
+    platform: group
+    services:
+      - service: mobile_app_jkevinburton_iphone12mini
+      - service: mobile_app_denver_denvers_iphone_7
+  - name: keaton_ios
+    platform: group
+    services:
+      - service: mobile_app_iphone
+  - name: parents_ios
+    platform: group
+    services:
+      - service: mobile_app_jkevinburton_iphone12mini
+      - service: mobile_app_tamaras_iphone
+  - name: kevin_ios
+    platform: group
+    services:
+      - service: mobile_app_jkevinburton_iphone12mini
+  - name: tamara_ios
+    platform: group
+    services:
+      - service: mobile_app_tamaras_iphone
+
+  - name: twitter
+    platform: twitter
+    consumer_key: !secret twitter_consumer_key
+    consumer_secret: !secret twitter_consumer_secret
+    access_token: !secret twitter_access_token
+    access_token_secret: !secret twitter_access_secret
+
+  - name: facebook
+    platform: facebook
+    page_access_token: !secret facebook_page_access_token
+# ========================================================
+# SCRIPTS
+# ========================================================
+
+script:
+  # // text notification wrapper
+  # usage:
+  # service: script.text_notify
+  # data:
+  #   who: "parents"
+  #   message: "Hello World"
+  text_notify:
+    sequence:
+      - condition: state
+        entity_id: input_boolean.text_notifications
+        state: "on"
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: '{{ who == "kevin" }}'
+            sequence:
+              - service: notify.kevin_ios
+                data:
+                  title: "Jarvis"
+                  message: "{{ message }}"
+          - conditions:
+              - condition: template
+                value_template: '{{ who == "denver" }}'
+            sequence:
+              - service: notify.denver_ios
+                data:
+                  title: "Jarvis"
+                  message: "{{ message }}"
+          - conditions:
+              - condition: template
+                value_template: '{{ who == "tamara" }}'
+            sequence:
+              - service: notify.tamara_ios
+                data:
+                  title: "Jarvis"
+                  message: "{{ message }}"
+          - conditions:
+              - condition: template
+                value_template: '{{ who == "parents" }}'
+            sequence:
+              - service: notify.parents_ios
+                data:
+                  title: "Jarvis"
+                  message: "{{ message }}"
+        default:
+          - service: notify.family_ios
+            data:
+              title: "Jarvis"
+              message: "{{ message }}"
+
+  # // audible notification wrapper
+  alexa_voice:
+    sequence:
+      - condition: state
+        entity_id: input_boolean.audible_notifications
+        state: "on"
+      - service: >
+          {% if is_state('input_boolean.debug_mode', 'on') %}
+            notify.alexa_media_basement_echo
+          {% else %}
+            notify.alexa_media_family_room_echo
+          {% endif %}
+        data:
+          message: "{{ message }}"
+
+  # // speech engine wrapper
+  speech_engine:
+    sequence:
+      - service: mqtt.publish
+        data_template:
+          topic: "tele/house/alexa/lastmsg"
+          payload: 'This message is from {{ now().strftime("%-I") }}:{{ now().strftime("%M") }} {{ now().strftime("%p") }}. {{ message | striptags | truncate(220)}}'
+          retain: true
+      - service: mqtt.publish
+        data_template:
+          topic: "tele/house/alexa/lastloc"
+          payload: "{{ who }}"
+          retain: true
+      - condition: state
+        entity_id: binary_sensor.quiet_time
+        state: "off"
+      # - service: script.debug
+      #   data:
+      #     what: 'last_audio_notification'
+      #     message: 'This message was sent to {{ who }} at {{ now().strftime("%-I") }}:{{ now().strftime("%M") }} {{ now().strftime("%p") }}. {{ message | striptags | truncate(220)}}'
+      - service: script.alexa_voice
+        data:
+          who: "{{ who }}"
+          message: "{{ message }}"
+
+  # // audible status announcement
+  status_annc:
+    sequence:
+      - service: script.speech_engine
+        data:
+          who: "{{ who }}"
+          message: >-
+
+            {% macro greeting() %}
+              {% if now().strftime('%H')|int < 12%}
+                Good morning.
+              {% elif now().strftime('%H')|int >= 12 and now().strftime('%H')|int < 17 %}
+                Good afternoon.
+              {% else %}
+                Good evening.
+              {% endif %}
+            {% endmacro %}
+
+            {% macro interuption() %}
+              {{ [
+                'Pardon me... ',
+                'Excuse me... ',
+              ] | random }}
+            {% endmacro %}
+
+            {% macro confirmation() %}
+              {{ [
+                'not a problem at all',
+                'working on it now',
+                'as you wish',
+                'leave it to me',
+                'if you insist',
+                'okey dokey'
+              ] | random }}
+            {% endmacro %}
+
+            {% macro washer_done() %}
+              {{ [
+                'the clothes are done in the washer.',
+                'time to move the clothes to the dryer before they start to smell.'
+              ] | random }}
+            {% endmacro %}
+
+            {% macro dryer_done() %}
+              {{ [
+                'the clothes are dry.',
+                'seems the clothers are sufficiently dry.'
+              ] | random }}
+            {% endmacro %}
+
+            {# ************************************************************ #}
+            {# ************************************************************ #}
+            {# ************************************************************ #}
+            {# ************************************************************ #}
+            {# ************************************************************ #}
+            {# ************************************************************ #}
+
+            {%- macro mother_of_all_macros() %}
+
+              {% if call_greeting == 1 %}
+                {{ greeting() }}
+              {% endif %}
+
+              {% if call_interuption == 1 %}
+                {{ interuption() }}
+              {% endif %}
+
+              {% if call_confirmation == 1 %}
+                {{ confirmation() }}
+              {% endif %}
+
+              {% if call_washer_done == 1 %}
+                {{ washer_done() }}
+              {% endif %}
+
+              {% if call_dryer_done == 1 %}
+                {{ dryer_done() }}
+              {% endif %}
+
+            {%- endmacro -%}
+
+            {{- cleanup(mother_of_all_macros()) -}}
