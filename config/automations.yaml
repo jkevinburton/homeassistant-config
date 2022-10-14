@@ -1,0 +1,13 @@
+- id: '1649890623054'
+  alias: Send a camera snapshot when motion is detected
+  description: ''
+  use_blueprint:
+    path: homeassistant/send_motion_to_phone.yaml
+    input:
+      notification_message: '{{ motion_sensor_name }} detected movement!'
+      motion_sensor: binary_sensor.uvc_doorbell_motion
+      camera: camera.uvc_doorbell_high
+      notify_device: 19f0083b539d73051915543f6be8dd44
+      is_ios: true
+      delay: 0
+      notification_title: Motion detected!

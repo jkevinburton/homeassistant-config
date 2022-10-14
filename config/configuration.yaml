@@ -5,10 +5,10 @@ homeassistant:
   latitude: !secret lat_coord
   longitude: !secret long_coord
   elevation: !secret elevation
-  packages: !include_dir_named packages
+  packages: !include_dir_named components/packages
 
 python_script:
 input_text:
 input_number:
 
-automation: !include automations.yaml
+automation: !include automations.yaml #!include_dir_named components/automation
