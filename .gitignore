@@ -19,7 +19,8 @@ transporter.py
 /config/hacs
 /config/zigbee2mqtt/
 /config/custom_components/localtuya/__pycache__/
-
+/config/components/zones
+!.gitkeep
 
 # ignore any of these files no matter where they are using double *
 **.DS_Store
