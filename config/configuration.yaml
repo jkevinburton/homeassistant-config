@@ -1,5 +1,5 @@
 homeassistant:
-  name: Burton House
+  name: Burton House on Gladstone
   unit_system: metric
   time_zone: !secret time_zone
   latitude: !secret lat_coord
