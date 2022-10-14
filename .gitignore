@@ -20,7 +20,7 @@ transporter.py
 /config/zigbee2mqtt/
 /config/custom_components/localtuya/__pycache__/
 /config/components/zones
-!.gitkeep
+!/config/components/zones/.gitkeep
 
 # ignore any of these files no matter where they are using double *
 **.DS_Store
@@ -39,7 +39,6 @@ transporter.py
 **google_calendars.yaml
 **ip_bans.yaml
 **.spotify-token-cache
-**zones.yaml
 **test.yaml
 **testing.yaml
 **.homekit*
