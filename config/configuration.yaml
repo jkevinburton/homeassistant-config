@@ -12,3 +12,15 @@ input_text:
 input_number:
 
 automation: !include automations.yaml #!include_dir_named components/automation
+
+panel_iframe:
+  portainer:
+    title: "Portainer"
+    icon: mdi:docker
+    url: !secret portainer_url
+    require_admin: true
+  vscode:
+    title: "Visual Studio Code"
+    icon: mdi:microsoft-visual-studio-code
+    url: !secret codeserver_url
+    require_admin: true

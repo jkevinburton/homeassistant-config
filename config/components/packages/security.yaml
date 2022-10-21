@@ -160,6 +160,9 @@ automation:
       - condition: state
         entity_id: input_boolean.sentry_mode
         state: "off"
+      - condition: state
+        entity_id: input_boolean.disable_automations
+        state: "off"
     action:
       - service: input_boolean.turn_on
         entity_id: input_boolean.sentry_mode
@@ -175,6 +178,9 @@ automation:
       - condition: state
         entity_id: input_boolean.sentry_mode
         state: "on"
+      - condition: state
+        entity_id: input_boolean.disable_automations
+        state: "off"
     action:
       - service: input_boolean.turn_off
         entity_id: input_boolean.sentry_mode
@@ -191,6 +197,9 @@ automation:
       - condition: state
         entity_id: input_boolean.sentry_mode
         state: "on"
+      - condition: state
+        entity_id: input_boolean.disable_automations
+        state: "off"
     action:
       - service: script.update_front_door_motion_away_count
     initial_state: true

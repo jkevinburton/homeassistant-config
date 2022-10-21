@@ -1,0 +1,68 @@
+binary_sensor:
+  - platform: group
+    name: "Main Floor Motion Sensor"
+    device_class: motion
+    entities:
+      - binary_sensor.kitchen_p1_motion
+      - binary_sensor.dining_room_pir
+
+automation:
+  - id: '1666058509311'
+    alias: Turn ON Kitchen Lights AFTER DARK on Motion
+    description: When motion is detected in the kitchen and the lights are off, turn
+      them on and set it to a nice low level not to hurt your eyes.
+    trigger:
+    - platform: state
+      entity_id:
+      - binary_sensor.kitchen_p1_motion
+      from: 'off'
+      to: 'on'
+    condition:
+    - condition: state
+      entity_id: light.smart_dimmer_switch_2_light
+      state: 'off'
+    action:
+    - service: script.turn_on_kitchen_lights
+      data:
+        percent: 40
+    mode: single
+
+  - id: '1666058901102'
+    alias: Turn OFF Kitchen Lights when NO motion
+    description: ''
+    trigger:
+    - platform: state
+      entity_id:
+      - binary_sensor.main_floor_motion_sensor
+      from: 'on'
+      to: 'off'
+      for:
+        hours: 0
+        minutes: 5
+        seconds: 0
+    condition:
+    - condition: state
+      entity_id: light.smart_dimmer_switch_2_light
+      state: 'on'
+    action:
+      - service: script.turn_off_kitchen_lights
+    mode: single
+
+
+script:
+  turn_on_kitchen_lights:
+    sequence:
+      - service: light.turn_on
+        entity_id: light.smart_dimmer_switch_2_light
+        data:
+          brightness_pct: "{{ percent }}"
+
+
+  turn_off_kitchen_lights:
+    sequence:
+      - service: light.turn_on
+        entity_id: light.smart_dimmer_switch_2_light
+        data:
+          brightness_pct: 1
+      - service: light.turn_off
+        entity_id: light.smart_dimmer_switch_2_light

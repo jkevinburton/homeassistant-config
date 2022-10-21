@@ -15,6 +15,12 @@ mqtt:
       state_topic: "tele/house/alexa/lastloc"
       icon: mdi:text
 
+input_boolean:
+  disable_automations:
+    name: Disable Automations
+    icon: mdi:arrow-decision-auto
+    initial: false
+
 input_number:
   motion_timeout_for_lights:
     name: Motion Timeout
@@ -148,7 +154,7 @@ automation:
       - service: switch.turn_off
         entity_id: switch.driveway_lights_socket_1
   # -----------------------------------------------------------
-  - id: water_leak_detected
+  - id: water_leak_detected_laundry_room
     alias: Notify when flood is detected
     trigger:
       - platform: state
@@ -156,7 +162,18 @@ automation:
         from: "off"
         to: "on"
     action:
-      - service: script.leak_detected
+      - service: script.basement_leak_detected
+    initial_state: true
+   # -----------------------------------------------------------
+  - id: water_leak_detected_kitchen
+    alias: Notify when flood is detected
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.kitchen_water_leak_sensor
+        from: "off"
+        to: "on"
+    action:
+      - service: script.kitchen_leak_detected
     initial_state: true
   # -----------------------------------------------------------
   - id: set_washer_state_running
@@ -262,12 +279,18 @@ automation:
 
 script:
   # // leak detected
-  leak_detected:
+  basement_leak_detected:
     sequence:
       - service: script.text_notify
         data_template:
           who: "parents"
           message: "I have detected water in the laundry room."
+  kitchen_leak_detected:
+    sequence:
+      - service: script.text_notify
+        data_template:
+          who: "parents"
+          message: "I have detected water in the kitchen under the cabinets."
 
   # // washer is done
   washing_machine_done:
