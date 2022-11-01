@@ -1,0 +1,307 @@
+
+mqtt:
+  sensor:
+    - name: "Washing Machine Status"
+      state_topic: "tele/house/washing_machine/status"
+      icon: mdi:washing-machine
+    # // clothes dryer status
+    - name: "Clothes Dryer Status"
+      state_topic: "tele/house/clothes_dryer/status"
+      icon: mdi:tumble-dryer
+    # ---------------------------------------------------------
+    - name: "Jarvis Last Message"
+      state_topic: "tele/house/alexa/lastmsg"
+      icon: mdi:bullhorn
+    - name: "Jarvis Last Location"
+      state_topic: "tele/house/alexa/lastloc"
+      icon: mdi:text
+
+sensor:
+  - platform: template
+    sensors:
+
+      # ------------------------------------------------ STATS -------------------
+      sensor_count:
+        friendly_name: "Number of Sensors"
+        value_template: >-
+          {{ states.sensor | rejectattr('state', 'eq', 'unavailable') | list | count }}
+      automation_count:
+        friendly_name: "Number of Automations"
+        value_template: >-
+          {{ states.automation| rejectattr('state', 'eq', 'unavailable') | list | count }}
+      script_count:
+        friendly_name: "Number of Scripts"
+        value_template: >-
+          {{ states.script | rejectattr('state', 'eq', 'unavailable') | list | count }}
+      binary_sensor_count:
+        friendly_name: "Number of Binary Sensors"
+        value_template: >-
+          {{ states.binary_sensor | rejectattr('state', 'eq', 'unavailable') | list | count }}
+      tracker_count:
+        friendly_name: "Number of Devices"
+        value_template: >-
+          {{ states.device_tracker| rejectattr('state', 'eq', 'unavailable') | list | count }}
+      lights_count:
+        friendly_name: "Number of Lights"
+        value_template: >-
+          {{ states.light | rejectattr('state', 'eq', 'unavailable') | list | count }}
+      switches_count:
+        friendly_name: "Number of Switches"
+        value_template: >-
+          {{ states.switch | rejectattr('state', 'eq', 'unavailable') | list | count }}
+      camera_count:
+        friendly_name: "Number of online Cameras"
+        value_template: >-
+          {{ states.camera | rejectattr('state', 'eq', 'unavailable') | list | count }}
+      entities_count:
+        friendly_name: "Number of Entities"
+        value_template: >-
+          {{ states | rejectattr('state', 'eq', 'unavailable') | list | count}}
+      # na_entities:
+      #   friendly_name: 'NA Entities'
+      #   value_template: >-
+      #     {{ states | selectattr('state', 'eq', 'unavailable') | map(attribute='entity_id') | list | truncate(250, False) }}
+      na_entities_count:
+        friendly_name: "Number of NA Entities"
+        value_template: >-
+          {{ states | selectattr('state', 'eq', 'unavailable') | map(attribute='entity_id') | list | count }}
+      hvac_action:
+        friendly_name: "HVAC Action"
+        value_template: "{{states.climate.thermostat.attributes.hvac_action}}"
+      today_is:
+        friendly_name: "Today is"
+        value_template: "{{ ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'][now().weekday()] }}"
+      month_is:
+        friendly_name: "Month is"
+        value_template: "{{ ['January','February','March','April','May','June','August','September','October','November','December'][now().month-1] }}"
+      # holiday:
+      #   friendly_name: 'Holiday'
+      #   value_template: >-
+      #       {% if states.calendar.holidays_in_united_states.state == 'on' %}
+      #         {{ states.calendar.holidays_in_united_states.attributes.message }}
+      #       {% elif states.calendar.anchorage_holidays.state == 'on' %}
+      #         {{ states.calendar.anchorage_holidays.attributes.message }}
+      #       {% else %}
+      #         none
+      #       {% endif %}
+
+automation:
+  # -----------------------------------------------------------
+  - id: turn_on_outdoor_lights
+    alias: Turn ON outdoor lights
+    initial_state: true
+    trigger:
+      - platform: sun
+        event: sunset
+    action:
+      #      - service: light.turn_on
+      #        entity_id: light.outdoor_oasis_lights
+      - service: light.turn_on
+        entity_id: light.outdoor_front_lights
+      - service: switch.turn_on
+        entity_id: switch.driveway_lights_socket_1
+  # -----------------------------------------------------------
+  - id: turn_off_outdoor_lights
+    alias: Turn OFF outdoor lights
+    initial_state: true
+    trigger:
+      - platform: sun
+        event: sunrise
+    action:
+      #      - service: light.turn_off
+      #        entity_id: light.outdoor_oasis_lights
+      - service: light.turn_off
+        entity_id: light.outdoor_front_lights
+      - service: switch.turn_off
+        entity_id: switch.driveway_lights_socket_1
+  # -----------------------------------------------------------
+  - id: water_leak_detected_laundry_room
+    alias: Notify when flood is detected
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.basement_leak_sensor
+        from: "off"
+        to: "on"
+    action:
+      - service: script.basement_leak_detected
+    initial_state: true
+   # -----------------------------------------------------------
+  - id: water_leak_detected_kitchen
+    alias: Notify when flood is detected
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.kitchen_water_leak_sensor
+        from: "off"
+        to: "on"
+    action:
+      - service: script.kitchen_leak_detected
+    initial_state: true
+  # -----------------------------------------------------------
+  - id: set_washer_state_running
+    alias: Set washing machine state when when running
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.washing_machine_power_monitor_energy_power
+        above: 3
+    action:
+      - service: mqtt.publish
+        data:
+          topic: tele/house/washing_machine/status
+          payload: running
+          retain: true
+    initial_state: true
+  # -----------------------------------------------------------
+  - id: set_washer_state_done
+    alias: Set washing machine state when done
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.washing_machine_power_monitor_energy_power
+        below: 2
+        for:
+          seconds: 30
+    condition:
+      - condition: state
+        entity_id: sensor.washing_machine_status
+        state: running
+    action:
+      - service: mqtt.publish
+        data:
+          topic: tele/house/washing_machine/status
+          payload: done
+          retain: true
+      - service: script.washing_machine_done
+      - delay:
+          minutes: 5
+      - service: mqtt.publish
+        data:
+          topic: tele/house/washing_machine/status
+          payload: idle
+          retain: true
+    initial_state: true
+  # -----------------------------------------------------------
+  - id: set_dryer_running
+    alias: Set clothes dryer state when running
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.clothes_dryer_am2301_temperature
+        above: 32
+    condition:
+      condition: or
+      conditions:
+        - condition: state
+          entity_id: sensor.clothes_dryer_status
+          state: idle
+        - condition: state
+          entity_id: sensor.clothes_dryer_status
+          state: dry
+        - condition: state
+          entity_id: sensor.clothes_dryer_status
+          state: unknown
+    action:
+      - service: mqtt.publish
+        data:
+          topic: tele/house/clothes_dryer/status
+          payload: running
+          retain: true
+    initial_state: true
+  # -----------------------------------------------------------
+  - id: set_dryer_done
+    alias: Set clothes dryer state when dry
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.clothes_dryer_humidity
+        below: 20
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: sensor.clothes_dryer_status
+          state: running
+        - condition: numeric_state
+          entity_id: sensor.clothes_dryer_am2301_temperature
+          above: 32
+    action:
+      - service: mqtt.publish
+        data:
+          topic: tele/house/clothes_dryer/status
+          payload: dry
+          retain: true
+      - service: script.clothes_dryer_done
+      - delay:
+          minutes: 5
+      - service: mqtt.publish
+        data:
+          topic: tele/house/clothes_dryer/status
+          payload: idle
+          retain: true
+    initial_state: true
+  
+  - id: turn_on_power_to_microwave
+    alias: Turn ON power to Microwave when cabinet door open
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.microwave_cabinet_door
+        from: 'off'
+        to: 'on'
+    condition: []
+    action:
+      - service: switch.turn_on
+        entity_id: switch.microwave_cabinet_power
+    initial_state: true
+  
+  - id: turn_off_power_to_microwave
+    alias: Turn OFF power to Microwave when cabinet door closed
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.microwave_cabinet_door
+        from: 'on'
+        to: 'off'
+    condition: []
+    action:
+      - service: switch.turn_off
+        entity_id: switch.microwave_cabinet_power
+    initial_state: true
+
+  # -----------------------------------------------------------
+
+script:
+  # // leak detected
+  basement_leak_detected:
+    sequence:
+      - service: script.text_notify
+        data_template:
+          who: "parents"
+          message: "I have detected water in the laundry room."
+  kitchen_leak_detected:
+    sequence:
+      - service: script.text_notify
+        data_template:
+          who: "parents"
+          message: "I have detected water in the kitchen under the cabinets."
+
+  # // washer is done
+  washing_machine_done:
+    sequence:
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: sensor.clothes_dryer_status
+                state: running
+            sequence:
+              - service: script.text_notify
+                data_template:
+                  who: "parents"
+                  message: "I have been told the washer is done, but the dryer is still running, should be ready soon."
+        default:
+          - service: script.text_notify
+            data_template:
+              who: "parents"
+              message: "I have been told the washer is done, time to move them over to the dryer."
+
+  # // dryer is done
+  clothes_dryer_done:
+    sequence:
+      - service: script.text_notify
+        data_template:
+          who: "parents"
+          message: "Its been about 5 minutes since I detected that the clothes in the dryer are dry enough to be done."

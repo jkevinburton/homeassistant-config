@@ -37,7 +37,7 @@ automation:
         entity_id: sensor.water_softener_status
         from: "Good"
         to: "Low"
-        for: "00:05:00"
+        for: "12:00:00"
     condition:
       - condition: state
         entity_id: input_boolean.alert_low_salt

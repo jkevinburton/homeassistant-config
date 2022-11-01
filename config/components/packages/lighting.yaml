@@ -1,68 +1,224 @@
-binary_sensor:
-  - platform: group
-    name: "Main Floor Motion Sensor"
-    device_class: motion
+template:
+  - sensor:
+      - name: Kitchen Light Brightness
+        icon: mdi:lightbulb-on-outline
+        state: >
+          {{ state_attr('light.smart_dimmer_switch_2_light', 'brightness') }}
+
+input_number:
+  lights_night_mode:
+    name: Lights Night Mode
+    initial: 15
+    min: 5
+    max: 20
+  lights_regular_mode:
+    name: Lights Regular Mode
+    initial: 30
+    min: 30
+    max: 100
+  light_timeout:
+    name: Light Timeout
+    unit_of_measurement: "m"
+    initial: 5
+    min: 1
+    max: 10
+  
+group:
+  family_room_reading_lights:
+    name: Reading Lights
+    icon: mdi:book-open-page-variant-outline
     entities:
-      - binary_sensor.kitchen_p1_motion
-      - binary_sensor.dining_room_pir
+      - light.family_room_left_sconce
+      - light.family_room_right_sconce
 
 automation:
-  - id: '1666058509311'
-    alias: Turn ON Kitchen Lights AFTER DARK on Motion
-    description: When motion is detected in the kitchen and the lights are off, turn
-      them on and set it to a nice low level not to hurt your eyes.
+
+  # ----------------------------------------------------------
+
+  - id: turn_on_kitchen_lights_on_motion
+    alias: Turn ON Kitchen Lights on Motion
     trigger:
-    - platform: state
-      entity_id:
-      - binary_sensor.kitchen_p1_motion
-      from: 'off'
-      to: 'on'
+      - platform: state
+        entity_id: binary_sensor.kitchen_p1_motion
+        from: 'off'
+        to: 'on'
     condition:
-    - condition: state
-      entity_id: light.smart_dimmer_switch_2_light
-      state: 'off'
+      - condition: state
+        entity_id: input_boolean.guest_mode
+        state: 'off'
+      - condition: state
+        entity_id: light.smart_dimmer_switch_2_light
+        state: 'off'
     action:
-    - service: script.turn_on_kitchen_lights
-      data:
-        percent: 40
+      - choose:            
+        - conditions:
+            - condition: time
+              after: "21:00:00"
+              before: "06:00:00"
+          sequence:
+            - service: light.turn_on
+              entity_id: light.smart_dimmer_switch_2_light
+              data:
+                brightness_pct: "{{ states('input_number.lights_night_mode') | int }}"
+        default:
+          - service: light.turn_on
+            entity_id: light.smart_dimmer_switch_2_light
+            data:
+              brightness_pct: "{{ states('input_number.lights_regular_mode') | int }}"
     mode: single
 
-  - id: '1666058901102'
+  # ----------------------------------------------------------
+
+  - id: turn_off_kitchen_lights_no_motion
     alias: Turn OFF Kitchen Lights when NO motion
-    description: ''
     trigger:
-    - platform: state
-      entity_id:
-      - binary_sensor.main_floor_motion_sensor
-      from: 'on'
-      to: 'off'
-      for:
-        hours: 0
-        minutes: 5
-        seconds: 0
+      - platform: state
+        entity_id: binary_sensor.main_floor_occupancy
+        from: 'on'
+        to: 'off'
+        for:
+          hours: 0
+          minutes: "{{ states('input_number.light_timeout') | int }}"
+          seconds: 0
     condition:
-    - condition: state
-      entity_id: light.smart_dimmer_switch_2_light
-      state: 'on'
+      - condition: state
+        entity_id: input_boolean.guest_mode
+        state: 'off'
+      - condition: state
+        entity_id: light.smart_dimmer_switch_2_light
+        state: 'on'
     action:
-      - service: script.turn_off_kitchen_lights
-    mode: single
-
-
-script:
-  turn_on_kitchen_lights:
-    sequence:
       - service: light.turn_on
         entity_id: light.smart_dimmer_switch_2_light
         data:
-          brightness_pct: "{{ percent }}"
-
-
-  turn_off_kitchen_lights:
-    sequence:
-      - service: light.turn_on
-        entity_id: light.smart_dimmer_switch_2_light
-        data:
-          brightness_pct: 1
+          brightness_pct: "{{ states('input_number.lights_night_mode') | int }}"
       - service: light.turn_off
         entity_id: light.smart_dimmer_switch_2_light
+    mode: single
+
+  
+  # ----------------------------------------------------------
+
+  - id: turn_on_basement_lights_on_motion
+    alias: Turn ON Basement Lights on Motion
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.basement_occupancy
+        from: 'off'
+        to: 'on'
+    condition:
+      - condition: state
+        entity_id: light.basement_lights_light
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.guest_mode
+        state: 'off'
+    action:
+      - choose:            
+        - conditions:
+            - condition: time
+              after: "08:00:00"
+              before: "19:00:00"
+          sequence:
+            - service: light.turn_on
+              entity_id: light.basement_lights_light
+              data:
+                brightness_pct: "{{ states('input_number.lights_regular_mode') | int }}"
+        default:
+          - service: light.turn_on
+            entity_id: light.basement_lights_light
+            data:
+              brightness_pct: "{{ states('input_number.lights_night_mode') | int }}"
+    mode: single
+  
+  - id: turn_off_basement_lights_on_motion
+    alias: Turn OFF Basement lights on NO Motion
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.basement_occupancy
+        from: 'on'
+        to: 'off'
+        for:
+          hours: 0
+          minutes: "{{ states('input_number.light_timeout') | int }}"
+          seconds: 0
+      - platform: state
+        entity_id: binary_sensor.kevin_is_working
+        from: 'on'
+        to: 'off'
+        for:
+          hours: 0
+          minutes: "{{ states('input_number.light_timeout') | int }}"
+          seconds: 0
+    condition:
+      - condition: state
+        entity_id: light.basement_occupancy
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.guest_mode
+        state: 'off'
+    action:
+      - service: light.turn_on
+        entity_id: light.basement_lights_light
+        data:
+          brightness_pct: "{{ states('input_number.lights_night_mode') | int }}"
+      - service: light.turn_off
+        entity_id: light.basement_lights_light
+    mode: single
+
+
+  # ----------------------------------------------------------
+  
+  - id: turn_on_family_room_lights_on_motion
+    alias: Turn ON family room lights when motion detected
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.family_room_occupancy
+        from: 'off'
+        to: 'on'
+    condition:
+      # make sure that the TV is OFF
+      - condition: state
+        entity_id: remote.58_hisense_roku_tv
+        state: 'off'
+      - condition: state
+        entity_id: light.family_room_pot_lights
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.guest_mode
+        state: 'off'
+    action:
+      - service: light.turn_on
+        entity_id: light.family_room_pot_lights
+#        data:
+#          brightness_pct: "{{ states('input_number.mode') | int }}"
+    mode: single
+
+  # ----------------------------------------------------------
+
+  - id: turn_off_family_room_lights
+    alias: Turn OFF Family Room Lights when NO motion
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.family_room_occupancy
+        from: 'on'
+        to: 'off'
+        for:
+          hours: 0
+          minutes: "{{ states('input_number.light_timeout') | int }}"
+          seconds: 0
+    condition:
+      - condition: state
+        entity_id: light.family_room_occupancy
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.guest_mode
+        state: 'off'
+    action:
+ #     - service: light.turn_on
+ #       entity_id: light.family_room_pot_lights
+ #       data:
+ #         brightness_pct: "{{ states('input_number.lights_regular_mode') | int }}"
+      - service: light.turn_off
+        entity_id: light.family_room_pot_lights
+    mode: single

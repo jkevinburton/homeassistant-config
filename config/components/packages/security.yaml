@@ -194,9 +194,9 @@ automation:
         from: "off"
         to: "on"
     condition:
-      - condition: state
-        entity_id: input_boolean.sentry_mode
-        state: "on"
+      # - condition: state
+      #   entity_id: input_boolean.sentry_mode
+      #   state: "on"
       - condition: state
         entity_id: input_boolean.disable_automations
         state: "off"
@@ -214,8 +214,11 @@ automation:
         to: "on"
     condition:
       - condition: state
-        entity_id: input_boolean.sentry_mode
-        state: "on"
+        entity_id: input_boolean.disable_automations
+        state: "off"
+      # - condition: state
+      #   entity_id: input_boolean.sentry_mode
+      #   state: "on"
     action:
       - service: script.update_back_deck_motion_count
     initial_state: true

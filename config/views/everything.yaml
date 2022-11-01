@@ -1,0 +1,225 @@
+views:
+  - title: Home
+    cards:
+      - type: entities
+        entities:
+          - entity: light.basement_lights_light
+          - entity: binary_sensor.basement_occupancy
+          - entity: binary_sensor.basement_tv
+          - entity: binary_sensor.kevin_is_working
+            name: Kevin is at his desk
+            secondary_info: none
+          - entity: media_player.living_room
+        title: Basement
+        state_color: true
+      - type: entities
+        entities:
+          - entity: light.pot_lights_2
+          - entity: binary_sensor.family_room_occupancy
+          - entity: binary_sensor.theatre_mode
+          - entity: light.family_room_wall_lights
+          - entity: group.family_room_reading_lights
+          - entity: binary_sensor.family_room_back_window
+          - entity: binary_sensor.family_room_side_window
+        title: Family Room
+        state_color: true
+        show_header_toggle: false
+      - type: entities
+        entities:
+          - entity: sensor.washing_machine_status
+          - entity: sensor.clothes_dryer_status
+          - entity: sensor.water_softener_status
+        title: Laundry Room
+        state_color: true
+        show_header_toggle: false
+      - type: entities
+        entities:
+          - entity: light.smart_dimmer_switch_2_light
+          - entity: binary_sensor.kitchen_p1_motion
+          - entity: sensor.kitchen_p1_illuminance
+          - entity: binary_sensor.kitchen_front_window
+          - entity: binary_sensor.kitchen_side_window
+        title: Kitchen
+        state_color: true
+        show_header_toggle: false
+      - type: entities
+        entities:
+          - entity: binary_sensor.dining_room_pir
+          - entity: binary_sensor.microwave_cabinet_door
+          - entity: switch.microwave_cabinet_power
+          - entity: binary_sensor.good_room_window_left
+          - entity: binary_sensor.good_room_window_right
+        title: Dining Room
+        state_color: true
+        show_header_toggle: false
+      - type: vertical-stack
+        cards:
+          - type: entities
+            entities:
+              - entity: light.flex_room_lights
+              - entity: switch.garage_door
+            title: Garage
+            show_header_toggle: false
+            state_color: true
+          - square: false
+            columns: 2
+            type: grid
+            cards:
+              - show_state: false
+                show_name: false
+                camera_view: live
+                type: picture-entity
+                entity: camera.uvc_family_room_high
+                image: https://demo.home-assistant.io/stub_config/bedroom.png
+      - type: vertical-stack
+        cards:
+          - type: entities
+            entities:
+              - entity: light.outdoor_oasis_lights
+              - entity: sensor.back_deck_motion_away_count
+            title: Backyard
+            state_color: true
+            show_header_toggle: false
+          - square: false
+            columns: 2
+            type: grid
+            cards:
+              - show_state: false
+                show_name: false
+                camera_view: live
+                type: picture-entity
+                entity: camera.uvc_back_deck_high
+                image: https://demo.home-assistant.io/stub_config/bedroom.png
+                aspect_ratio: 16x9
+              - show_state: false
+                show_name: false
+                camera_view: live
+                type: picture-entity
+                entity: camera.uvc_back_windows_high
+                image: https://demo.home-assistant.io/stub_config/bedroom.png
+                aspect_ratio: 16x9
+      - type: entities
+        entities:
+          - entity: sun.sun
+          - entity: binary_sensor.front_door
+          - entity: binary_sensor.side_door
+          - entity: binary_sensor.basement_bathroom_window
+          - entity: input_number.light_timeout
+          - entity: input_number.lights_night_mode
+          - entity: input_number.lights_regular_mode
+          - entity: input_boolean.audible_notifications
+          - entity: input_boolean.guest_mode
+          - entity: input_boolean.text_notifications
+          - entity: input_boolean.alerts_house_doorbell
+          - entity: input_boolean.alerts_door_garage
+          - entity: input_boolean.disable_automations
+          - entity: input_boolean.alert_low_salt
+          - entity: input_boolean.sentry_mode
+          - entity: input_datetime.audible_notification_on
+          - entity: input_datetime.audible_notification_off
+          - entity: input_datetime.morning_report
+          - entity: input_datetime.family_room_time
+          - entity: weather.woodstock
+          - entity: climate.thermostat
+            secondary_info: none
+        title: House
+        state_color: true
+        show_header_toggle: false
+      - type: vertical-stack
+        cards:
+          - type: entities
+            entities:
+              - entity: light.outdoor_front_lights
+              - entity: light.driveway_flood_lights
+              - entity: binary_sensor.uvc_driveway_motion
+              - entity: binary_sensor.uvc_doorbell_motion
+              - entity: sensor.front_door_motion_away_count
+            title: Front Yard
+            show_header_toggle: false
+          - square: false
+            columns: 2
+            type: grid
+            cards:
+              - show_state: false
+                show_name: false
+                camera_view: live
+                type: picture-entity
+                entity: camera.uvc_doorbell_high
+                image: https://demo.home-assistant.io/stub_config/bedroom.png
+                aspect_ratio: 16x9
+              - show_state: false
+                show_name: false
+                camera_view: live
+                type: picture-entity
+                entity: camera.uvc_driveway_high
+                image: https://demo.home-assistant.io/stub_config/bedroom.png
+                aspect_ratio: 16x9
+      - type: vertical-stack
+        cards:
+          - type: grid
+            title: Bell Fibe Internet
+            cards:
+              - type: gauge
+                entity: sensor.speed_test_download
+                needle: true
+                min: 0
+                max: 500
+                name: Download
+                severity:
+                  green: 300
+                  yellow: 100
+                  red: 1
+              - type: gauge
+                entity: sensor.speed_test_upload
+                needle: true
+                severity:
+                  green: 300
+                  yellow: 100
+                  red: 1
+                min: 0
+                max: 500
+                name: Upload
+              - type: gauge
+                entity: sensor.speed_test_ping
+                name: Ping
+                needle: true
+                max: 40
+                severity:
+                  green: 1
+                  yellow: 15
+                  red: 30
+                min: 1
+          - type: history-graph
+            entities:
+              - entity: sensor.speed_test_download
+            hours_to_show: 178
+      - type: thermostat
+        entity: climate.thermostat
+        name: Burton House
+      - square: false
+        columns: 4
+        type: grid
+        cards:
+          - type: custom:mushroom-person-card
+            entity: person.kevin_burton
+            layout: vertical
+            name: Kevin
+            fill_container: true
+          - type: custom:mushroom-person-card
+            entity: person.tamara_burton
+            layout: vertical
+            name: Tamara
+          - type: custom:mushroom-person-card
+            entity: person.keaton_burton
+            layout: vertical
+            name: Keaton
+          - type: custom:mushroom-person-card
+            entity: person.denver_burton
+            name: Denver
+            layout: vertical
+      - type: entities
+        entities:
+          - entity: light.denver_light
+          - entity: binary_sensor.denver_room_motion_pir
+          - entity: person.denver_burton
+        title: Denver

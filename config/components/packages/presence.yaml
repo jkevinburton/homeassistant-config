@@ -6,3 +6,44 @@ sensor:
     state_topic: "espresense/rooms"
     timeout: 60
     away_timeout: 120 # number of seconds after which the enitity will get status not_home
+  
+template:
+  - binary_sensor:
+      - name: "Kevin is working"
+        icon: mdi:laptop-account
+        state: >
+          {{ is_state('sensor.kevin_iphone_12_mini_ble', 'office') }}
+      - name: "Theatre Mode"
+        icon: mdi:television
+        state: >
+          {{ is_state('remote.58_hisense_roku_tv', 'on') }}
+      - name: "Basement TV"
+        icon: mdi:television
+        state: >
+          {{ is_state('media_player.living_room', 'playing') }}
+
+binary_sensor:
+  - platform: group
+    name: "Family Room Occupancy"
+    device_class: motion
+    entities:
+      - binary_sensor.family_room_motion_pir_iaszone
+      - binary_sensor.family_room_secondary_pir
+      - binary_sensor.theatre_mode
+      
+  - platform: group
+    name: "Main Floor Occupancy"
+    device_class: motion
+    entities:
+      - binary_sensor.kitchen_p1_motion
+      - binary_sensor.dining_room_pir
+
+  - platform: group
+    name: "Basement Occupancy"
+    device_class: motion
+    entities:
+      - binary_sensor.basement_seating_motion
+      - binary_sensor.basement_pir
+      - binary_sensor.kevin_is_working
+      - binary_sensor.basement_tv
+
