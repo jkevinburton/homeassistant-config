@@ -183,7 +183,7 @@ automation:
     alias: Set clothes dryer state when running
     trigger:
       - platform: numeric_state
-        entity_id: sensor.clothes_dryer_am2301_temperature
+        entity_id: sensor.dryer_am2301_temperature
         above: 32
     condition:
       condition: or
@@ -209,7 +209,7 @@ automation:
     alias: Set clothes dryer state when dry
     trigger:
       - platform: numeric_state
-        entity_id: sensor.clothes_dryer_humidity
+        entity_id: sensor.dryer_am2301_humidity
         below: 20
     condition:
       condition: and
@@ -218,7 +218,7 @@ automation:
           entity_id: sensor.clothes_dryer_status
           state: running
         - condition: numeric_state
-          entity_id: sensor.clothes_dryer_am2301_temperature
+          entity_id: sensor.dryer_am2301_temperature
           above: 32
     action:
       - service: mqtt.publish

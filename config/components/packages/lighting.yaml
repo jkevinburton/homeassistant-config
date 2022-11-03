@@ -3,7 +3,7 @@ template:
       - name: Kitchen Light Brightness
         icon: mdi:lightbulb-on-outline
         state: >
-          {{ state_attr('light.smart_dimmer_switch_2_light', 'brightness') }}
+          {{ state_attr('light.kitchen_main_lights_light', 'brightness') }}
 
 input_number:
   lights_night_mode:
@@ -28,8 +28,8 @@ group:
     name: Reading Lights
     icon: mdi:book-open-page-variant-outline
     entities:
-      - light.family_room_left_sconce
-      - light.family_room_right_sconce
+      - light.reading_lights_left
+      - light.reading_lights_right
 
 automation:
 
@@ -47,7 +47,7 @@ automation:
         entity_id: input_boolean.guest_mode
         state: 'off'
       - condition: state
-        entity_id: light.smart_dimmer_switch_2_light
+        entity_id: light.kitchen_main_lights_light
         state: 'off'
     action:
       - choose:            
@@ -57,12 +57,12 @@ automation:
               before: "06:00:00"
           sequence:
             - service: light.turn_on
-              entity_id: light.smart_dimmer_switch_2_light
+              entity_id: light.kitchen_main_lights_light
               data:
                 brightness_pct: "{{ states('input_number.lights_night_mode') | int }}"
         default:
           - service: light.turn_on
-            entity_id: light.smart_dimmer_switch_2_light
+            entity_id: light.kitchen_main_lights_light
             data:
               brightness_pct: "{{ states('input_number.lights_regular_mode') | int }}"
     mode: single
@@ -85,15 +85,15 @@ automation:
         entity_id: input_boolean.guest_mode
         state: 'off'
       - condition: state
-        entity_id: light.smart_dimmer_switch_2_light
+        entity_id: light.kitchen_main_lights_light
         state: 'on'
     action:
       - service: light.turn_on
-        entity_id: light.smart_dimmer_switch_2_light
+        entity_id: light.kitchen_main_lights_light
         data:
           brightness_pct: "{{ states('input_number.lights_night_mode') | int }}"
       - service: light.turn_off
-        entity_id: light.smart_dimmer_switch_2_light
+        entity_id: light.kitchen_main_lights_light
     mode: single
 
   
@@ -209,7 +209,7 @@ automation:
           seconds: 0
     condition:
       - condition: state
-        entity_id: light.family_room_occupancy
+        entity_id: binary_sensor.family_room_occupancy
         state: 'off'
       - condition: state
         entity_id: input_boolean.guest_mode
