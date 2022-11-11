@@ -1,0 +1,36 @@
+title: "House"
+path: "house"
+cards:
+  - type: "custom:button-card"
+    template: chip_back
+    variables:
+      ulm_chip_back_path: home
+  
+  - type: 'custom:button-card'
+    template: card_title
+    name: House
+
+
+  # --------------------------------------------------------------------------
+  # HVAC
+  # --------------------------------------------------------------------------
+  - type: "custom:button-card"
+    template: card_thermostat
+    entity: climate.thermostat
+    variables:
+      ulm_card_thermostat_enable_collapse: true
+      ulm_card_thermostat_enable_controls: true
+      ulm_card_thermostat_enable_hvac_modes: true
+      ulm_card_thermostat_enable_popup: true
+      ulm_card_thermostat_enable_background_color: true
+      ulm_card_thermostat_enable_display_temperature: true
+
+
+
+  # --------------------------------------------------------------------------
+  # Footer
+  # --------------------------------------------------------------------------
+  - type: 'custom:button-card'
+    template: card_title
+    label: "&copy; 2022 Burton House on Gladstone"
+  

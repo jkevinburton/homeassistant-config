@@ -1,0 +1,179 @@
+title: "Home"
+path: "home"
+cards:
+  - type: "custom:button-card"
+    template: "card_esh_welcome"
+    triggers_update: "input_boolean.minimalist_dropdown"
+    variables:
+      ulm_card_esh_welcome_collapse: input_boolean.minimalist_dropdown
+      ulm_weather: "weather.woodstock"
+      entity_1:
+        nav: "house"
+        icon: "mdi:home"
+        name: "House"
+        color: "purple"
+      entity_2:
+        nav: "security"
+        icon: "mdi:shield"
+        name: "Secure"
+        color: "green"
+      entity_3:
+        nav: "climate"
+        icon: "mdi:sun-thermometer-outline"
+        name: "°C"
+        color: "yellow"
+      entity_4:
+        nav: "network"
+        icon: "mdi:nas"
+        name: Lab
+        color: "blue"
+      entity_5:
+        nav: "network"
+        icon: "mdi:information-outline"
+        name: Info
+        color: "red"
+  - type: horizontal-stack
+    cards:
+      - type: 'custom:button-card'
+        template: card_person
+        entity: person.tamara_burton
+        variables:
+          ulm_card_person_entity: person.tamara_burton
+          ulm_card_person_use_entity_picture: true
+          ulm_card_person_icon: mdi:face-woman
+          ulm_card_person_battery: sensor.tamaras_iphone_battery_level
+      - type: 'custom:button-card'
+        template: card_person
+        entity: person.kevin_burton
+        variables:
+          ulm_card_person_entity: person.kevin_burton
+          ulm_card_person_use_entity_picture: true
+          ulm_card_person_icon: mdi:face-man
+          ulm_card_person_battery: sensor.jkevinburton_iphone11_battery_level
+  - type: horizontal-stack
+    cards:
+      - type: 'custom:button-card'
+        template: card_person
+        entity: person.denver_burton
+        variables:
+          ulm_card_person_entity: person.denver_burton
+          ulm_card_person_use_entity_picture: true
+          ulm_card_person_icon: mdi:face-man
+          ulm_card_person_battery: sensor.denver_denvers_iphone_7_battery_level
+      - type: 'custom:button-card'
+        template: card_person
+        entity: person.keaton_burton
+        variables:
+          ulm_card_person_entity: person.keaton_burton
+          ulm_card_person_use_entity_picture: true
+          ulm_card_person_icon: mdi:face-man
+          ulm_card_person_battery: sensor.keeter_keatons_iphone_11_pro_battery_level
+  
+  # - type: custom:button-card
+  #   template: custom_card_httpedo13_sun
+  #   variables:
+  #     language: 'en'
+
+
+  - type: 'custom:button-card'
+    template: card_title
+    name: Rooms
+  
+  - type: horizontal-stack
+    cards:
+      - type: "custom:button-card"
+        template:
+          - card_esh_room
+          - yellow_on
+        name: Kitchen
+        entity: light.mj_kitchen_switch
+        icon: mdi:food
+        tap_action:
+          action: navigate
+          navigation_path: "kitchen"
+        variables:
+          ulm_custom_card_esh_room_light_entity: light.mj_kitchen_switch
+          # ulm_custom_card_esh_room_climate_entity: climate.thermostat
+        label: '[[[ return states["sensor.temperature"].state + "°C" ]]]'
+      - type: "custom:button-card"
+        template:
+          - card_esh_room
+          - yellow_on
+        name: Family Room
+        entity: switch.family_room_main_lights
+        icon: mdi:sofa
+        tap_action:
+          action: navigate
+          navigation_path: "familyroom"
+        variables:
+          ulm_custom_card_esh_room_light_entity: switch.family_room_main_lights
+          # ulm_custom_card_esh_room_climate_entity: climate.thermostat
+        label: '[[[ return states["sensor.temperature"].state + "°C" ]]]'
+  - type: horizontal-stack
+    cards:
+      - type: "custom:button-card"
+        template:
+          - card_esh_room
+          - yellow_on
+        name: Family Room
+        entity: light.mj_kitchen_switch
+        icon: mdi:food
+        tap_action:
+          action: navigate
+          navigation_path: "kitchen"
+        variables:
+          ulm_custom_card_esh_room_light_entity: light.mj_kitchen_switch
+          # ulm_custom_card_esh_room_climate_entity: climate.thermostat
+        label: '[[[ return states["sensor.temperature"].state + "°C" ]]]'
+      - type: "custom:button-card"
+        template:
+          - card_esh_room
+          - yellow_on
+        name: Basement
+        entity: switch.family_room_main_lights
+        icon: mdi:sofa
+        tap_action:
+          action: navigate
+          navigation_path: "familyroom"
+        variables:
+          ulm_custom_card_esh_room_light_entity: switch.family_room_main_lights
+          # ulm_custom_card_esh_room_climate_entity: climate.thermostat
+        label: '[[[ return states["sensor.temperature"].state + "°C" ]]]'
+
+  - type: horizontal-stack
+    cards:
+      - type: "custom:button-card"
+        template:
+          - card_esh_room
+          - yellow_on
+        name: Garage
+        entity: light.flex_room_lights
+        icon: mdi:garage
+        tap_action:
+          action: navigate
+          navigation_path: "garage"
+        variables:
+          ulm_custom_card_esh_room_light_entity: light.flex_room_lights
+          # ulm_custom_card_esh_room_climate_entity: climate.thermostat
+        label: '[[[ return states["sensor.temperature"].state + "°C" ]]]'
+      - type: "custom:button-card"
+        template:
+          - card_esh_room
+          - yellow_on
+        name: "Denver's Room"
+        entity: light.denver_light
+        icon: mdi:account-circle
+        tap_action:
+          action: navigate
+          navigation_path: "denver"
+        variables:
+          ulm_custom_card_esh_room_light_entity: light.denver_light
+          # ulm_custom_card_esh_room_climate_entity: climate.thermostat
+        label: '[[[ return "Occupancy: " + states["binary_sensor.denver_room_motion_pir"].state ]]]'
+
+  # --------------------------------------------------------------------------
+  # Footer
+  # --------------------------------------------------------------------------
+  - type: 'custom:button-card'
+    template: card_title
+    label: "&copy; 2022 Burton House on Gladstone"

@@ -1,0 +1,165 @@
+title: "Family Room"
+path: "familyroom"
+cards:
+  - type: "custom:button-card"
+    template: chip_back
+    variables:
+      ulm_chip_back_path: home
+  
+  - type: 'custom:button-card'
+    template: card_title
+    name: Family Room
+  
+  - type: 'custom:button-card'
+    template: card_title
+    label: "Lights"
+
+  - type: grid
+    square: false
+    columns: 2
+    cards:
+      - type: "custom:button-card"
+        template: card_light
+        entity: switch.family_room_main_lights
+        variables:
+          ulm_card_light_name: "Pot Lights"
+          ulm_card_light_enable_popup: true
+      - type: "custom:button-card"
+        template: card_light
+        entity: group.family_room_reading_lights
+        variables:
+          ulm_card_light_name: "Reading Lights"
+          ulm_card_light_enable_popup: true
+      - type: "custom:button-card"
+        template: card_light
+        entity: light.z_tv_light_bars
+        variables:
+          ulm_card_light_name: "Ambient Lights"
+          ulm_card_light_enable_popup: true
+      - type: "custom:button-card"
+        template: card_light
+        entity: light.z_tv_light_bars
+        variables:
+          ulm_card_light_name: "Lamp"
+          ulm_card_light_enable_popup: true
+      - type: "custom:button-card"
+        template: card_media_player
+        entity: media_player.58_hisense_roku_tv
+        variables:
+          ulm_card_media_player_name : Family Room TV
+          ulm_card_media_player_icon: "mdi:television"
+          ulm_card_media_player_enable_controls: false
+
+  
+  - type: 'custom:button-card'
+    template: card_title
+    label: "Sensors"
+  
+  
+  
+  # Room Motion
+  # -------------------------------------------------------------------
+  - type: horizontal-stack
+    cards:
+
+      - type: 'custom:button-card'
+        template: card_binary_sensor
+        variables:
+          ulm_card_binary_sensor_alert: true
+          ulm_show_last_changed: false
+          ulm_card_binary_sensor_name: "Room Motion"
+        entity: binary_sensor.family_room_back_window
+
+      - type: 'custom:button-card'
+        template: card_battery
+        entity: sensor.family_room_p1_motion_battery
+        variables:
+          ulm_card_battery_battery_level_danger: 20
+          ulm_card_battery_battery_level_warning: 50
+          ulm_card_battery_name: Battery
+
+  # Nook motion
+  # -------------------------------------------------------------------
+  - type: horizontal-stack
+    cards:
+
+      - type: 'custom:button-card'
+        template: card_binary_sensor
+        variables:
+          ulm_card_binary_sensor_alert: true
+          ulm_show_last_changed: false
+          ulm_card_binary_sensor_name: "Nook Motion"
+        entity: binary_sensor.family_room_back_window
+
+      - type: 'custom:button-card'
+        template: card_battery
+        entity: sensor.family_room_p1_motion_battery
+        variables:
+          ulm_card_battery_battery_level_danger: 20
+          ulm_card_battery_battery_level_warning: 50
+          ulm_card_battery_name: Battery
+
+  # -------------------------------------------------------------------
+  # -------------------------------------------------------------------
+
+  - type: 'custom:button-card'
+    template: card_title
+    label: "Contact Sensors"
+
+  # Back Window
+  # -------------------------------------------------------------------
+  - type: horizontal-stack
+    cards:
+      - type: 'custom:button-card'
+        template: card_binary_sensor
+        variables:
+          ulm_card_binary_sensor_alert: true
+          ulm_show_last_changed: false
+          ulm_card_binary_sensor_name: "Back Window"
+        entity: binary_sensor.family_room_back_window
+      - type: 'custom:button-card'
+        template: card_battery
+        entity: sensor.battery_level
+        variables:
+          ulm_card_battery_charger_type_entity_id: sensor.battery_level
+          ulm_card_battery_battery_level_danger: 20
+          ulm_card_battery_battery_level_warning: 50
+          ulm_card_battery_name: Back Window Battery
+  
+  # Side Window
+  # -------------------------------------------------------------------
+  - type: horizontal-stack
+    cards:
+      - type: 'custom:button-card'
+        template: card_binary_sensor
+        variables:
+          ulm_card_binary_sensor_alert: true
+          ulm_show_last_changed: false
+          ulm_card_binary_sensor_name: "Side Window"
+        entity: binary_sensor.family_room_side_window
+      - type: 'custom:button-card'
+        template: card_binary_sensor
+        variables:
+          ulm_card_binary_sensor_alert: true
+          ulm_show_last_changed: false
+          ulm_card_binary_sensor_name: "Side Window"
+        entity: binary_sensor.family_room_side_window
+  
+
+  
+  - type: 'custom:button-card'
+    template: card_title
+    label: "Settings"
+  
+  - type: 'custom:button-card'
+    template: card_input_boolean
+    entity: input_boolean.disable_family_room_motion_automation
+    variables:
+      ulm_card_input_boolean_name: Disable Auto Light Automation
+
+  # --------------------------------------------------------------------------
+  # Footer
+  # --------------------------------------------------------------------------
+  - type: 'custom:button-card'
+    template: card_title
+    label: "&copy; 2022 Burton House on Gladstone"

@@ -1,0 +1,37 @@
+title: Garage
+path: "garage"
+cards:
+  - type: "custom:button-card"
+    template: chip_back
+    variables:
+      ulm_chip_back_path: home
+  
+  - type: 'custom:button-card'
+    template: card_title
+    name: Garage
+
+  - type: "custom:button-card"
+    template: card_light
+    entity: light.flex_room_lights
+  
+  - type: "custom:button-card"
+    template: card_cover
+    entity: cover.garage_door
+    variables:
+      ulm_card_cover_enable_controls: true
+      ulm_card_cover_enable_slider: false
+  
+  - type: "custom:button-card"
+    entity: "camera.uvc_family_room_high"
+    template: "custom_card_camera"
+    show_icon: true #True if you set ulm_custom_card_camera_title: true
+    variables:
+      ulm_custom_card_camera_title: true
+      ulm_custom_card_camera_name: "Garage"
+  
+  # --------------------------------------------------------------------------
+  # Footer
+  # --------------------------------------------------------------------------
+  - type: 'custom:button-card'
+    template: card_title
+    label: "&copy; 2022 Burton House on Gladstone"

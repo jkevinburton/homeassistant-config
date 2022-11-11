@@ -1,0 +1,99 @@
+binary_sensor:
+  - platform: group
+    name: "Main Floor Occupancy"
+    device_class: motion
+    entities:
+      - binary_sensor.kitchen_p1_motion
+      - binary_sensor.dining_room_pir
+      - binary_sensor.front_door_contact_sensor
+      - binary_sensor.back_door_contact_sensor
+# ----------------------------------------------------------
+# ----------------------------------------------------------
+
+input_boolean:
+  disable_main_floor_motion_automation:
+    name: Disable Main Floor Motion Automation
+    icon: mdi:arrow-decision-auto
+    initial: false
+
+# ----------------------------------------------------------
+# ----------------------------------------------------------
+
+template:
+  - sensor:
+      - name: Kitchen Light Brightness
+        icon: mdi:lightbulb-on-outline
+        state: >
+          {{ state_attr('light.mj_kitchen_switch', 'brightness') }}
+
+# ----------------------------------------------------------
+# ----------------------------------------------------------
+
+automation:
+  # ----------------------------------------------------------
+  - id: turn_on_kitchen_lights_on_motion
+    alias: Turn ON Kitchen Lights on Motion
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.main_floor_occupancy
+        from: 'off'
+        to: 'on'
+    condition:
+      - condition: state
+        entity_id: input_boolean.guest_mode
+        state: 'off'
+      - condition: state
+        entity_id: light.mj_kitchen_switch
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.disable_main_floor_motion_automation
+        state: 'off'
+      - condition: numeric_state
+        entity_id: sensor.kitchen_p1_illuminance
+        below: 100
+    action:
+      - choose:            
+        - conditions:
+            - condition: time
+              after: "21:00:00"
+              before: "06:00:00"
+          sequence:
+            - service: light.turn_on
+              entity_id: light.mj_kitchen_switch
+              data:
+                brightness_pct: "{{ states('input_number.lights_night_mode') | int }}"
+        default:
+          - service: light.turn_on
+            entity_id: light.mj_kitchen_switch
+            data:
+              brightness_pct: "{{ states('input_number.lights_regular_mode') | int }}"
+    mode: single
+  # ----------------------------------------------------------
+  - id: turn_off_kitchen_lights_no_motion
+    alias: Turn OFF Kitchen Lights when NO motion
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.main_floor_occupancy
+        from: 'on'
+        to: 'off'
+        for:
+          hours: 0
+          minutes: "{{ states('input_number.light_timeout') | int }}"
+          seconds: 0
+    condition:
+      - condition: state
+        entity_id: binary_sensor.main_floor_occupancy
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.guest_mode
+        state: 'off'
+      - condition: state
+        entity_id: light.mj_kitchen_switch
+        state: 'on'
+      - condition: state
+        entity_id: input_boolean.disable_main_floor_motion_automation
+        state: 'off'
+    action:
+      - service: light.turn_off
+        entity_id: light.mj_kitchen_switch
+    mode: single

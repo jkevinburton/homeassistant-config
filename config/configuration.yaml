@@ -24,3 +24,13 @@ panel_iframe:
     icon: mdi:script-text-key-outline
     url: !secret esphome_url
     require_admin: true
+  # pihole:
+  #   title: "Pi-Hole"
+  #   icon: mdi:pi-hole
+  #   url: !secret pihole_url
+  #   require_admin: true
+  # unifi:
+  #   title: "Unifi Network"
+  #   icon: mdi:network-pos
+  #   url: !secret unifi_url
+  #   require_admin: true

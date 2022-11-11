@@ -30,5 +30,5 @@ sensor:
     trigger_pin: D5
     echo_pin: D6
     name: "Ultrasonic Sensor"
-    update_interval: 5s
+    update_interval: 12h
     timeout: 5m

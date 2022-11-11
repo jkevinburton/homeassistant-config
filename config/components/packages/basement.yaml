@@ -1,0 +1,104 @@
+binary_sensor:
+  - platform: group
+    name: "Basement Occupancy"
+    device_class: motion
+    entities:
+      - binary_sensor.basement_seating_motion
+      - binary_sensor.basement_pir
+      - binary_sensor.kevin_is_working
+      - binary_sensor.basement_tv
+
+# ----------------------------------------------------------
+# ----------------------------------------------------------
+
+input_boolean:
+  disable_basement_motion_automation:
+    name: Disable Basement Motion Automation
+    icon: mdi:arrow-decision-auto
+    initial: false
+
+template:
+  - binary_sensor:
+      - name: "Kevin is working"
+        icon: mdi:laptop-account
+        state: >
+          {{ is_state('sensor.kevin_iphone_12_mini_ble', 'office') }}
+      - name: "Basement TV"
+        icon: mdi:television
+        state: >
+          {{ is_state('media_player.living_room', 'playing') }}
+
+# ----------------------------------------------------------
+# ----------------------------------------------------------
+
+automation:
+  # ----------------------------------------------------------
+  - id: turn_on_basement_lights_on_motion
+    alias: Turn ON Basement Lights on Motion
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.basement_occupancy
+        from: 'off'
+        to: 'on'
+    condition:
+      - condition: state
+        entity_id: light.basement_lights_light
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.guest_mode
+        state: 'off'
+    action:
+      - choose:            
+        - conditions:
+            - condition: time
+              after: "08:00:00"
+              before: "19:00:00"
+          sequence:
+            - service: light.turn_on
+              entity_id: light.basement_lights_light
+              data:
+                brightness_pct: "{{ states('input_number.lights_regular_mode') | int }}"
+        default:
+          - service: light.turn_on
+            entity_id: light.basement_lights_light
+            data:
+              brightness_pct: "{{ states('input_number.lights_night_mode') | int }}"
+    mode: single
+  
+  - id: turn_off_basement_lights_on_motion
+    alias: Turn OFF Basement lights on NO Motion
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.basement_occupancy
+        from: 'on'
+        to: 'off'
+        for:
+          hours: 0
+          minutes: "{{ states('input_number.light_timeout') | int }}"
+          seconds: 0
+      - platform: state
+        entity_id: binary_sensor.kevin_is_working
+        from: 'on'
+        to: 'off'
+        for:
+          hours: 0
+          minutes: "{{ states('input_number.light_timeout') | int }}"
+          seconds: 0
+    condition:
+      - condition: state
+        entity_id: binary_sensor.basement_occupancy
+        state: 'off'
+      - condition: state
+        entity_id: light.basement_lights_light
+        state: 'on'
+      - condition: state
+        entity_id: input_boolean.guest_mode
+        state: 'off'
+    action:
+      - service: light.turn_on
+        entity_id: light.basement_lights_light
+        data:
+          brightness_pct: "{{ states('input_number.lights_night_mode') | int }}"
+      - service: light.turn_off
+        entity_id: light.basement_lights_light
+    mode: single
