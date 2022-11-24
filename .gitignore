@@ -21,6 +21,7 @@ transporter.py
 /config/custom_components/localtuya/__pycache__/
 /config/components/zones
 /config/image
+/config/zones.yaml
 !/config/components/zones/.gitkeep
 
 # ignore any of these files no matter where they are using double *
