@@ -29,6 +29,19 @@ cards:
       ulm_card_weather_backdrop:
         fade: true
   
+  - type: custom:weather-radar-card
+    zoom_level: 10
+    show_marker: true
+    show_playback: false
+    show_recenter: false
+    square_map: true
+    show_range: false
+    show_scale: true
+    static_map: true
+    extra_labels: false
+    map_style: Light
+    data_source: RainViewer-Original
+
   # --------------------------------------------------------------------------
   # Sunrise/Sunset
   # --------------------------------------------------------------------------

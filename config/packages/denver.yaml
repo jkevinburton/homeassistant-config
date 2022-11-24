@@ -50,7 +50,7 @@ automation:
         to: 'off'
         for:
           hours: 0
-          minutes: 8 # do not use default, Denver does allot of sedetary stuff //"{{ states('input_number.light_timeout') | int }}"
+          minutes: 5 # do not use default, Denver does allot of sedetary stuff //"{{ states('input_number.light_timeout') | int }}"
           seconds: 0
     condition:
       - condition: state
@@ -61,6 +61,9 @@ automation:
         state: 'on'
       - condition: state
         entity_id: input_boolean.guest_mode
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.disable_automations
         state: 'off'
       - condition: state
         entity_id: input_boolean.disable_denver_bedroom_motion_automation
@@ -82,7 +85,7 @@ automation:
         to: 'off'
         for:
           hours: 0
-          minutes: 10 # do not use default, Denver does allot of sedetary stuff //"{{ states('input_number.light_timeout') | int }}"
+          minutes: 7 # do not use default, Denver does allot of sedetary stuff //"{{ states('input_number.light_timeout') | int }}"
           seconds: 0
     condition:
       - condition: state
@@ -93,6 +96,9 @@ automation:
         state: 'on'
       - condition: state
         entity_id: input_boolean.guest_mode
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.disable_automations
         state: 'off'
       - condition: state
         entity_id: input_boolean.disable_denver_bedroom_motion_automation

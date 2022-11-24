@@ -1,0 +1,116 @@
+binary_sensor:
+  - platform: group
+    name: "Basement Occupancy"
+    device_class: motion
+    entities:
+      - binary_sensor.basement_seating_motion
+      - binary_sensor.basement_pir
+      - binary_sensor.kevin_is_working
+      - binary_sensor.basement_tv
+
+# ----------------------------------------------------------
+# ----------------------------------------------------------
+
+# device_id: c8cce925ffa216107cb550b229508a8e 
+# entity_id: light.basement_lights_light
+
+
+input_boolean:
+  disable_basement_motion_automation:
+    name: Disable Basement Motion Automation
+    icon: mdi:arrow-decision-auto
+    initial: false
+
+template:
+  - binary_sensor:
+      - name: "Kevin is working"
+        icon: mdi:laptop-account
+        state: >
+          {{ is_state('sensor.kevin_iphone_12_mini_ble', 'office') }}
+      - name: "Basement TV"
+        icon: mdi:television
+        state: >
+          {{ is_state('media_player.living_room', 'playing') }}
+
+# ----------------------------------------------------------
+# ----------------------------------------------------------
+
+# ----------------------------------------------------------
+# ----------------------------------------------------------
+
+timer:
+  basement_light_timer:
+    duration: "00:05:00"
+    restore: true
+    icon: mdi:timer
+    name: "Basement Light Timer"
+
+# ----------------------------------------------------------
+# ----------------------------------------------------------
+
+automation:
+
+  - id: 'basement_automatic_lights'
+    alias: 'Basement Automatic Lights'
+    description: ''
+    trigger:
+    - platform: event
+      event_type: timer.finished
+      event_data:
+        entity_id: timer.basement_light_timer
+      id: Basement Light Timer Finished
+    - platform: state
+      entity_id:
+      - binary_sensor.basement_occupancy
+      from: 'on'
+      to: 'off'
+      id: Basement Occupancy Cleared
+    - platform: state
+      entity_id:
+      - binary_sensor.basement_occupancy
+      from: 'off'
+      to: 'on'
+      id: Basement Occupancy Detected
+    condition:
+      - condition: state
+        entity_id: input_boolean.disable_basement_motion_automation
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.guest_mode
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.disable_automations
+        state: 'off'
+    action:
+    - choose:
+      - conditions:
+        - condition: trigger
+          id: Basement Occupancy Cleared
+        sequence:
+        - service: timer.start
+          target:
+            entity_id: timer.basement_light_timer
+      - conditions:
+        - condition: trigger
+          id: Basement Occupancy Detected
+        - condition: state
+          entity_id: input_boolean.guest_mode
+          state: 'off'
+        sequence:
+        - service: timer.cancel
+          data: {}
+          target:
+            entity_id: timer.basement_light_timer
+        - type: turn_on
+          device_id: 307b59b49203e5337d5e42478de268a1
+          entity_id: light.basement_light
+          domain: light
+      - conditions:
+        - condition: trigger
+          id: Basement Light Timer Finished
+        sequence:
+        - type: turn_off
+          device_id: 307b59b49203e5337d5e42478de268a1
+          entity_id: light.basement_light
+          domain: light
+    mode: single

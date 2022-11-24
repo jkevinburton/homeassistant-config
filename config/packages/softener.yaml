@@ -42,6 +42,12 @@ automation:
       - condition: state
         entity_id: input_boolean.alert_low_salt
         state: "on"
+      - condition: state
+        entity_id: input_boolean.guest_mode
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.disable_automations
+        state: 'off'
     action:
       - service: script.water_softener_low
     initial_state: true

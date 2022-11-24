@@ -1,0 +1,37 @@
+title: "Denver"
+path: "denver"
+cards:
+  - type: "custom:button-card"
+    template: chip_back
+    variables:
+      ulm_chip_back_path: home
+  
+  - type: 'custom:button-card'
+    template: card_title
+    name: Denver's
+    label: Bedroom
+  
+  - type: "custom:button-card"
+    template: card_light
+    entity: light.denver_light
+
+  - type: 'custom:button-card'
+    template: card_binary_sensor_alert
+    variables:
+      ulm_card_binary_sensor_alert: true
+      ulm_show_last_changed: true
+      ulm_card_binary_sensor_alert_name: "Motion"
+    entity: binary_sensor.denver_room_motion_pir
+
+  # --------------------------------------------------------------------------
+  # Settings
+  # --------------------------------------------------------------------------
+  - type: 'custom:button-card'
+    template: card_title
+    label: "Settings"
+
+  - type: 'custom:button-card'
+    template: card_input_boolean
+    entity: input_boolean.disable_denver_bedroom_motion_automation
+    variables:
+      ulm_card_input_boolean_name: Disable Auto Lights Off

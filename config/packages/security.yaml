@@ -18,6 +18,10 @@ input_boolean:
   alerts_house_doorbell:
     name: Doorbell Alert
     icon: mdi:bullhorn
+  
+  garage_after_dark:
+    name: Garage Open After Dark
+    icon: mdi:message-alert
 
 mqtt:
   sensor:
@@ -26,49 +30,15 @@ mqtt:
     - name: Back Deck Motion Away Count
       state_topic: "tele/house/back_deck_motion/away_count"
 
-# binary_sensor:
-#   - platform: template
-#     sensors:
-#       alarm_basement_bathroom_window:
-#         friendly_name: "Powder Room Window"
-#         device_class: window
-#         value_template: "{{ state_attr('alarm_control_panel.alarm_com', 'sensor_status')|regex_search('Basement Bathroom Window is Open', ignorecase=True) }}"
-#       alarm_eating_nook_window:
-#         friendly_name: "Eating Nook Window"
-#         device_class: window
-#         value_template: "{{ state_attr('alarm_control_panel.alarm_com', 'sensor_status')|regex_search('Eating Nook Window is Open', ignorecase=True) }}"
-#       alarm_family_room_back_window:
-#         friendly_name: "Family Room Back Window"
-#         device_class: window
-#         value_template: "{{ state_attr('alarm_control_panel.alarm_com', 'sensor_status')|regex_search('Family Room Back Window is Open', ignorecase=True) }}"
-#       alarm_family_room_side_window:
-#         friendly_name: "Family Room Side Window"
-#         device_class: window
-#         value_template: "{{ state_attr('alarm_control_panel.alarm_com', 'sensor_status')|regex_search('Family Room Side Window is Open', ignorecase=True) }}"
-#       alarm_front_door:
-#         friendly_name: "Front Door"
-#         device_class: door
-#         value_template: "{{ state_attr('alarm_control_panel.alarm_com', 'sensor_status')|regex_search('Front Door is Open', ignorecase=True) }}"
-#       alarm_good_room_left_window:
-#         friendly_name: "Good Room Left Window"
-#         device_class: window
-#         value_template: "{{ state_attr('alarm_control_panel.alarm_com', 'sensor_status')|regex_search('Good Room Window Left is Open', ignorecase=True) }}"
-#       alarm_good_room_right_window:
-#         friendly_name: "Good Room Right Window"
-#         device_class: window
-#         value_template: "{{ state_attr('alarm_control_panel.alarm_com', 'sensor_status')|regex_search('Good Room Window Right is Open', ignorecase=True) }}"
-#       alarm_keaton_bedroom_window:
-#         friendly_name: "Keaton Bedroom Window"
-#         device_class: window
-#         value_template: "{{ state_attr('alarm_control_panel.alarm_com', 'sensor_status')|regex_search('Keaton Bedroom Window is Open', ignorecase=True) }}"
-#       alarm_kitchen_window:
-#         friendly_name: "Kitchen Sink Window"
-#         device_class: window
-#         value_template: "{{ state_attr('alarm_control_panel.alarm_com', 'sensor_status')|regex_search('Kitchen Window is Open', ignorecase=True) }}"
-#       alarm_side_door:
-#         friendly_name: "Side Door"
-#         device_class: door
-#         value_template: "{{ state_attr('alarm_control_panel.alarm_com', 'sensor_status')|regex_search('Side Door is Open', ignorecase=True) }}"
+template:
+  - sensor:
+      - name: "Sentry Mode Status"
+        state: >
+          {% if is_state('input_boolean.sentry_mode', 'on') %}
+            Armed
+          {% else %}
+            Disarmed
+          {% endif %}
 
 script:
   arm_home_alarm:
@@ -161,8 +131,11 @@ automation:
         entity_id: input_boolean.sentry_mode
         state: "off"
       - condition: state
+        entity_id: input_boolean.guest_mode
+        state: 'off'
+      - condition: state
         entity_id: input_boolean.disable_automations
-        state: "off"
+        state: 'off'
     action:
       - service: input_boolean.turn_on
         entity_id: input_boolean.sentry_mode
@@ -179,8 +152,11 @@ automation:
         entity_id: input_boolean.sentry_mode
         state: "on"
       - condition: state
+        entity_id: input_boolean.guest_mode
+        state: 'off'
+      - condition: state
         entity_id: input_boolean.disable_automations
-        state: "off"
+        state: 'off'
     action:
       - service: input_boolean.turn_off
         entity_id: input_boolean.sentry_mode
@@ -222,6 +198,38 @@ automation:
     action:
       - service: script.update_back_deck_motion_count
     initial_state: true
+  
+  - id: garage_closed
+    alias: Garage Closed
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.garage_door_state
+        from: 'on'
+        to: 'off'
+    action:
+      - service: input_boolean.turn_off
+        entity_id: input_boolean.garage_after_dark
+    initial_state: true
+  
+  - id: close_garage_lights_out
+    alias: Close Garage at lights out
+    initial_state: true
+    trigger:
+      - platform: time
+        at: '22:30:00'
+    condition:
+      - condition: state
+        entity_id: binary_sensor.garage_door_state
+        state: 'on'
+      - condition: state
+        entity_id: input_boolean.guest_mode
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.disable_automations
+        state: 'off'
+    action:
+      - service: input_boolea.turn_on
+        entity_id: input_boolean.garage_after_dark
 
   # - id: "1649887882852"
   #   alias: Save a camera snapshot when motion is detected at the front door

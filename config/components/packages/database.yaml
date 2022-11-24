@@ -1,6 +1,0 @@
-recorder:
-  db_url: !secret mariadb_url
-  purge_keep_days: 7
-
-history:
-logbook:

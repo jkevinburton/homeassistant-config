@@ -44,7 +44,6 @@ notify:
   - name: denver_ios
     platform: group
     services:
-      - service: mobile_app_jkevinburton_iphone12mini
       - service: mobile_app_denver_denvers_iphone_7
   - name: keaton_ios
     platform: group

@@ -1,0 +1,95 @@
+binary_sensor:
+  - platform: group
+    name: "Dining Room Occupancy"
+    device_class: motion
+    entities:
+      - binary_sensor.dining_room_pir
+  
+# ----------------------------------------------------------
+# ----------------------------------------------------------
+
+input_boolean:
+  disable_dining_room_motion_automation:
+    name: Disable Dining Room Motion Automation
+    icon: mdi:arrow-decision-auto
+    initial: false
+  
+
+# ----------------------------------------------------------
+# ----------------------------------------------------------
+
+timer:
+  dining_room_light_timer:
+    duration: "00:02:00"
+    restore: true
+    icon: mdi:timer
+    name: "Dining Room Light Timer"
+  
+
+# ----------------------------------------------------------
+# ----------------------------------------------------------
+
+automation:
+
+  - id: 'dining_room_automatic_lights'
+    alias: 'Dining Room Auotmatic Lights'
+    description: ''
+    trigger:
+    - platform: event
+      event_type: timer.finished
+      event_data:
+        entity_id: timer.dining_room_light_timer
+      id: Dining Room Light Timer Finished
+    - platform: state
+      entity_id:
+      - binary_sensor.dining_room_occupancy
+      from: 'on'
+      to: 'off'
+      id: Dining Room Occupancy Cleared
+    - platform: state
+      entity_id:
+      - binary_sensor.dining_room_occupancy
+      from: 'off'
+      to: 'on'
+      id: Dining Room Occupancy Detected
+    condition:
+      - condition: state
+        entity_id: input_boolean.guest_mode
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.disable_automations
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.disable_dining_room_motion_automation
+        state: 'off'
+    action:
+    - choose:
+      - conditions:
+        - condition: trigger
+          id: Dining Room Occupancy Cleared
+        sequence:
+        - service: timer.start
+          target:
+            entity_id: timer.dining_room_light_timer
+      - conditions:
+        - condition: trigger
+          id: Dining Room Occupancy Detected
+        sequence:
+        - service: timer.cancel
+          target:
+            entity_id: timer.dining_room_light_timer
+        - type: turn_on
+          device_id: 274788903ca15b7328fa94bab5b505e2
+          entity_id: light.dining_room_lights
+          domain: light
+      - conditions:
+        - condition: trigger
+          id: Dining Room Light Timer Finished
+        sequence:
+        - type: turn_off
+          device_id: 274788903ca15b7328fa94bab5b505e2
+          entity_id: light.dining_room_lights
+          domain: light
+    mode: single
+  
+  

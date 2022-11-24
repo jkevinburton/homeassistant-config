@@ -13,12 +13,14 @@ cards:
   # --------------------------------------------------------------------------
   # Alaram
   # --------------------------------------------------------------------------
-
-  - type: 'custom:button-card'
-    template: card_generic_swap
-    entity: input_boolean.sentry_mode
   
-
+  - type: 'custom:button-card'
+    template: card_generic
+    entity: sensor.sentry_mode_status
+    variables:
+      ulm_card_generic_name: Home Alarm System
+      ulm_card_generic_icon: mdi:shield
+  
   # --------------------------------------------------------------------------
   # Cameras
   # --------------------------------------------------------------------------
@@ -74,133 +76,133 @@ cards:
     cards:
 
       - type: 'custom:button-card'
-        template: card_binary_sensor
+        template: card_binary_sensor_alert
         variables:
           ulm_card_binary_sensor_alert: true
           ulm_show_last_changed: true
-          ulm_card_binary_sensor_name: "Front Door"
+          ulm_card_binary_sensor_alert_name: "Front Door"
         entity: binary_sensor.uvc_doorbell_motion
       
       - type: 'custom:button-card'
-        template: card_binary_sensor
+        template: card_binary_sensor_alert
         variables:
           ulm_card_binary_sensor_alert: true
           ulm_show_last_changed: true
-          ulm_card_binary_sensor_name: "Side Door"
+          ulm_card_binary_sensor_alert_name: "Side Door"
         entity: binary_sensor.uvc_driveway_motion
   
   - type: horizontal-stack
     cards:
 
       - type: 'custom:button-card'
-        template: card_binary_sensor
+        template: card_binary_sensor_alert
         variables:
           ulm_card_binary_sensor_alert: true
           ulm_show_last_changed: true
-          ulm_card_binary_sensor_name: "Back Deck"
+          ulm_card_binary_sensor_alert_name: "Back Deck"
         entity: binary_sensor.uvc_back_deck_motion 
       
       - type: 'custom:button-card'
-        template: card_binary_sensor
+        template: card_binary_sensor_alert
         variables:
           ulm_card_binary_sensor_alert: true
           ulm_show_last_changed: true
-          ulm_card_binary_sensor_name: "Back Windows"
+          ulm_card_binary_sensor_alert_name: "Back Windows"
         entity: binary_sensor.uvc_back_windows_motion 
   
   - type: horizontal-stack
     cards:
 
       - type: 'custom:button-card'
-        template: card_binary_sensor
+        template: card_binary_sensor_alert
         variables:
           ulm_card_binary_sensor_alert: true
           ulm_show_last_changed: true
-          ulm_card_binary_sensor_name: "In Garage"
+          ulm_card_binary_sensor_alert_name: "In Garage"
         entity: binary_sensor.uvc_family_room_motion
     
       - type: 'custom:button-card'
-        template: card_binary_sensor
+        template: card_binary_sensor_alert
         variables:
           ulm_card_binary_sensor_alert: true
           ulm_show_last_changed: true
-          ulm_card_binary_sensor_name: "Kitchen"
+          ulm_card_binary_sensor_alert_name: "Kitchen"
         entity: binary_sensor.kitchen_p1_motion
     
   - type: horizontal-stack
     cards:
 
       - type: 'custom:button-card'
-        template: card_binary_sensor
+        template: card_binary_sensor_alert
         variables:
           ulm_card_binary_sensor_alert: true
           ulm_show_last_changed: true
-          ulm_card_binary_sensor_name: "Dining Room"
+          ulm_card_binary_sensor_alert_name: "Dining Room"
         entity: binary_sensor.dining_room_pir
     
       - type: 'custom:button-card'
-        template: card_binary_sensor
+        template: card_binary_sensor_alert
         variables:
           ulm_card_binary_sensor_alert: true
           ulm_show_last_changed: true
-          ulm_card_binary_sensor_name: "Hallway"
+          ulm_card_binary_sensor_alert_name: "Hallway"
         entity: binary_sensor.upstairs_hallway_pir
   
   - type: horizontal-stack
     cards:
 
       - type: 'custom:button-card'
-        template: card_binary_sensor
+        template: card_binary_sensor_alert
         variables:
           ulm_card_binary_sensor_alert: true
           ulm_show_last_changed: true
-          ulm_card_binary_sensor_name: "Denver's Room"
+          ulm_card_binary_sensor_alert_name: "Denver's Room"
         entity: binary_sensor.denver_room_motion_pir
     
       - type: 'custom:button-card'
-        template: card_binary_sensor
+        template: card_binary_sensor_alert
         variables:
           ulm_card_binary_sensor_alert: true
           ulm_show_last_changed: true
-          ulm_card_binary_sensor_name: "Back Stairs"
+          ulm_card_binary_sensor_alert_name: "Back Stairs"
         entity: binary_sensor.back_stairs_motion
   
   - type: horizontal-stack
     cards:
 
       - type: 'custom:button-card'
-        template: card_binary_sensor
+        template: card_binary_sensor_alert
         variables:
           ulm_card_binary_sensor_alert: true
           ulm_show_last_changed: true
-          ulm_card_binary_sensor_name: "Family Room"
+          ulm_card_binary_sensor_alert_name: "Family Room"
         entity: binary_sensor.family_room_p1_motion
     
       - type: 'custom:button-card'
-        template: card_binary_sensor
+        template: card_binary_sensor_alert
         variables:
           ulm_card_binary_sensor_alert: true
           ulm_show_last_changed: true
-          ulm_card_binary_sensor_name: "Nook"
+          ulm_card_binary_sensor_alert_name: "Nook"
         entity: binary_sensor.family_room_secondary_pir
   
   - type: horizontal-stack
     cards:
 
       - type: 'custom:button-card'
-        template: card_binary_sensor
+        template: card_binary_sensor_alert
         variables:
           ulm_card_binary_sensor_alert: true
           ulm_show_last_changed: true
-          ulm_card_binary_sensor_name: "Flex Space"
+          ulm_card_binary_sensor_alert_name: "Flex Space"
         entity: binary_sensor.basement_seating_motion
     
       - type: 'custom:button-card'
-        template: card_binary_sensor
+        template: card_binary_sensor_alert
         variables:
           ulm_card_binary_sensor_alert: true
           ulm_show_last_changed: true
-          ulm_card_binary_sensor_name: "Office"
+          ulm_card_binary_sensor_alert_name: "Office"
         entity: binary_sensor.basement_pir
   
   # --------------------------------------------------------------------------
@@ -214,38 +216,38 @@ cards:
     cards:
 
       - type: 'custom:button-card'
-        template: card_binary_sensor
+        template: card_binary_sensor_alert
         variables:
           ulm_card_binary_sensor_alert: true
           ulm_show_last_changed: true
-          ulm_card_binary_sensor_name: "Front Door"
+          ulm_card_binary_sensor_alert_name: "Front Door"
         entity: binary_sensor.front_door_contact_sensor
       
       - type: 'custom:button-card'
-        template: card_binary_sensor
+        template: card_binary_sensor_alert
         variables:
           ulm_card_binary_sensor_alert: true
           ulm_show_last_changed: true
-          ulm_card_binary_sensor_name: "Back Door"
+          ulm_card_binary_sensor_alert_name: "Back Door"
         entity: binary_sensor.back_door_contact_sensor
   
   - type: horizontal-stack
     cards:
 
       - type: 'custom:button-card'
-        template: card_binary_sensor
+        template: card_binary_sensor_alert
         variables:
           ulm_card_binary_sensor_alert: true
           ulm_show_last_changed: true
-          ulm_card_binary_sensor_name: "Garage Door"
+          ulm_card_binary_sensor_alert_name: "Garage Door"
         entity: cover.garage_door
       
       - type: 'custom:button-card'
-        template: card_binary_sensor
+        template: card_binary_sensor_alert
         variables:
           ulm_card_binary_sensor_alert: true
           ulm_show_last_changed: true
-          ulm_card_binary_sensor_name: "Microwave"
+          ulm_card_binary_sensor_alert_name: "Microwave"
         entity: binary_sensor.microwave_cabinet_door
   
   # --------------------------------------------------------------------------
@@ -259,76 +261,76 @@ cards:
     cards:
 
       - type: 'custom:button-card'
-        template: card_binary_sensor
+        template: card_binary_sensor_alert
         variables:
           ulm_card_binary_sensor_alert: true
           ulm_show_last_changed: true
-          ulm_card_binary_sensor_name: "Bay Left"
+          ulm_card_binary_sensor_alert_name: "Bay Left"
         entity: binary_sensor.good_room_window_left
       
       - type: 'custom:button-card'
-        template: card_binary_sensor
+        template: card_binary_sensor_alert
         variables:
           ulm_card_binary_sensor_alert: true
           ulm_show_last_changed: true
-          ulm_card_binary_sensor_name: "Bay Right"
+          ulm_card_binary_sensor_alert_name: "Bay Right"
         entity: binary_sensor.good_room_window_right
   
   - type: horizontal-stack
     cards:
 
       - type: 'custom:button-card'
-        template: card_binary_sensor
+        template: card_binary_sensor_alert
         variables:
           ulm_card_binary_sensor_alert: true
           ulm_show_last_changed: true
-          ulm_card_binary_sensor_name: "Kitchen Front"
+          ulm_card_binary_sensor_alert_name: "Kitchen Front"
         entity: binary_sensor.kitchen_front_window
       
       - type: 'custom:button-card'
-        template: card_binary_sensor
+        template: card_binary_sensor_alert
         variables:
           ulm_card_binary_sensor_alert: true
           ulm_show_last_changed: true
-          ulm_card_binary_sensor_name: "Kitchen Sink"
+          ulm_card_binary_sensor_alert_name: "Kitchen Sink"
         entity: binary_sensor.kitchen_side_window
   
   - type: horizontal-stack
     cards:
 
       - type: 'custom:button-card'
-        template: card_binary_sensor
+        template: card_binary_sensor_alert
         variables:
           ulm_card_binary_sensor_alert: true
           ulm_show_last_changed: true
-          ulm_card_binary_sensor_name: "Powder Room"
+          ulm_card_binary_sensor_alert_name: "Powder Room"
         entity: binary_sensor.basement_bathroom_window
       
       - type: 'custom:button-card'
-        template: card_binary_sensor
+        template: card_binary_sensor_alert
         variables:
           ulm_card_binary_sensor_alert: true
           ulm_show_last_changed: true
-          ulm_card_binary_sensor_name: "Keaton"
+          ulm_card_binary_sensor_alert_name: "Keaton"
         entity: binary_sensor.keaton_bedroom_window
   
   - type: horizontal-stack
     cards:
 
       - type: 'custom:button-card'
-        template: card_binary_sensor
+        template: card_binary_sensor_alert
         variables:
           ulm_card_binary_sensor_alert: true
           ulm_show_last_changed: true
-          ulm_card_binary_sensor_name: "Family Back"
+          ulm_card_binary_sensor_alert_name: "Family Back"
         entity: binary_sensor.family_room_back_window
       
       - type: 'custom:button-card'
-        template: card_binary_sensor
+        template: card_binary_sensor_alert
         variables:
           ulm_card_binary_sensor_alert: true
           ulm_show_last_changed: true
-          ulm_card_binary_sensor_name: "Family Side"
+          ulm_card_binary_sensor_alert_name: "Family Side"
         entity: binary_sensor.family_room_side_window
   
   # --------------------------------------------------------------------------

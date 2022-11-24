@@ -31,6 +31,12 @@ automation:
         - condition: state
           entity_id: switch.zigbee_light_bars
           state: "off"
+        - condition: state
+          entity_id: input_boolean.guest_mode
+          state: 'off'
+        - condition: state
+          entity_id: input_boolean.disable_automations
+          state: 'off'
     action:
       - service: script.turn_on_tv_ambient
       - service: script.turn_on_lamp
@@ -50,6 +56,12 @@ automation:
       - condition: state
         entity_id: switch.zigbee_light_bars
         state: "on"
+      - condition: state
+        entity_id: input_boolean.guest_mode
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.disable_automations
+        state: 'off'
     action:
       - service: script.turn_off_tv_ambient
   # ------------------------------------------------------------
@@ -71,6 +83,12 @@ automation:
         - condition: state
           entity_id: switch.zigbee_light_bars
           state: "off"
+        - condition: state
+          entity_id: input_boolean.guest_mode
+          state: 'off'
+        - condition: state
+          entity_id: input_boolean.disable_automations
+          state: 'off'
     action:
       - service: script.turn_on_tv_ambient
 

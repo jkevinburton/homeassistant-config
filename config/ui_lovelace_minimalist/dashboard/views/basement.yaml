@@ -1,0 +1,152 @@
+title: "Basement"
+path: "basement"
+cards:
+  - type: "custom:button-card"
+    template: chip_back
+    variables:
+      ulm_chip_back_path: home
+  
+  - type: 'custom:button-card'
+    template: card_title
+    name: Flex Space
+    label: and Kevin's Office
+
+  # --------------------------------------------------------------------------
+  # Lights
+  # --------------------------------------------------------------------------
+  - type: 'custom:button-card'
+    template: card_title
+    label: "Lights"
+
+  - type: "custom:button-card"
+    template: card_light
+    entity: light.basement_light
+    variables:
+      ulm_card_light_name: "Lights"
+      ulm_card_light_enable_slider: true
+      ulm_card_light_enable_collapse: true
+      
+  # --------------------------------------------------------------------------
+  # Theatre
+  # --------------------------------------------------------------------------
+  - type: 'custom:button-card'
+    template: card_title
+    label: "Theatre"
+
+  - type: "custom:button-card"
+    template: card_media_player
+    entity: media_player.living_room
+    variables:
+      # ulm_card_media_player_name : Apple TV
+      # ulm_card_media_player_icon: "mdi:television"
+      ulm_card_media_player_enable_art: true
+      ulm_card_media_player_enable_controls: true
+      ulm_card_media_player_enable_popup: true
+      ulm_card_media_player_more_info: true
+      ulm_card_media_player_power_button: true
+  
+  # --------------------------------------------------------------------------
+  # Sensors
+  # --------------------------------------------------------------------------
+  - type: 'custom:button-card'
+    template: card_title
+    label: "Sensors"
+  
+  - type: 'custom:button-card'
+    template: card_binary_sensor_alert
+    variables:
+      ulm_card_binary_sensor_alert: true
+      ulm_show_last_changed: true
+    entity: binary_sensor.basement_occupancy
+  
+  - type: conditional
+    conditions:
+      - entity: timer.basement_light_timer
+        state_not: "idle"
+    card:
+      type: entities
+      entities:
+        - timer.basement_light_timer
+
+  # Room Motion
+  # -------------------------------------------------------------------
+  - type: horizontal-stack
+    cards:
+
+      - type: 'custom:button-card'
+        template: card_binary_sensor_alert
+        variables:
+          ulm_card_binary_sensor_alert: true
+          ulm_show_last_changed: false
+          ulm_card_binary_sensor_alert_name: "Room"
+        entity: binary_sensor.basement_pir
+
+      - type: 'custom:button-card'
+        template: card_battery
+        entity: sensor.basement_pir_battery
+        variables:
+          ulm_card_battery_battery_level_danger: 20
+          ulm_card_battery_battery_level_warning: 50
+          ulm_card_battery_name: Battery
+
+  # Flex Space motion
+  # -------------------------------------------------------------------
+  - type: horizontal-stack
+    cards:
+
+      - type: 'custom:button-card'
+        template: card_binary_sensor_alert
+        variables:
+          ulm_card_binary_sensor_alert: true
+          ulm_show_last_changed: false
+          ulm_card_binary_sensor_alert_name: "Play Area"
+        entity: binary_sensor.basement_seating_motion
+
+      - type: 'custom:button-card'
+        template: card_battery
+        entity: sensor.basement_seating_motion_battery
+        variables:
+          ulm_card_battery_battery_level_danger: 20
+          ulm_card_battery_battery_level_warning: 50
+          ulm_card_battery_name: Battery
+
+  - type: horizontal-stack
+    cards:
+
+      - type: 'custom:button-card'
+        template: card_binary_sensor_alert
+        variables:
+          ulm_card_binary_sensor_alert: false
+          ulm_show_last_changed: false
+          ulm_card_binary_sensor_alert_name: "At Work"
+        entity: binary_sensor.kevin_is_working
+      
+      - type: 'custom:button-card'
+        template: card_binary_sensor_alert
+        variables:
+          ulm_card_binary_sensor_alert: true
+          ulm_show_last_changed: false
+          ulm_card_binary_sensor_alert_name: "TV"
+        entity: binary_sensor.basement_tv
+
+        
+  
+  # --------------------------------------------------------------------------
+  # Settings
+  # --------------------------------------------------------------------------
+  - type: 'custom:button-card'
+    template: card_title
+    label: "Settings"
+
+  - type: 'custom:button-card'
+    template: card_input_boolean
+    entity: input_boolean.disable_basement_motion_automation
+    variables:
+      ulm_card_input_boolean_name: Disable Auto Light Automation
+
+  # --------------------------------------------------------------------------
+  # Footer
+  # --------------------------------------------------------------------------
+  - type: 'custom:button-card'
+    template: card_title
+    label: "&copy; 2022 Burton House on Gladstone"

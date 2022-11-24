@@ -1,0 +1,26 @@
+mqtt:
+  cover:
+    - name: "Garage Door"
+      command_topic: "cmnd/garage/door/POWER"
+      state_topic: "stat/garage/door/status"
+      availability_topic: "tele/garage/door/LWT"
+      qos: 1
+      payload_available: "Online"
+      payload_not_available: "Offline"
+      payload_open: "ON"
+      payload_close: "ON"
+      payload_stop: "ON"
+      state_open: "open"
+      state_closed: "closed"
+      device_class: garage
+
+  binary_sensor:
+    - name: "Garage Door State"
+      state_topic: "stat/garage/door/status"
+      payload_on: "open"
+      payload_off: "closed"
+      availability_topic: "tele/garage/door/LWT"
+      payload_available: "Online"
+      payload_not_available: "Offline"
+      qos: 1
+      device_class: garage_door

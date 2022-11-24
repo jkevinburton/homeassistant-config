@@ -1,0 +1,77 @@
+title: "Laundry Room"
+path: "laundry"
+cards:
+  - type: "custom:button-card"
+    template: chip_back
+    variables:
+      ulm_chip_back_path: home
+  
+  - type: 'custom:button-card'
+    template: card_title
+    name: Laundry Room
+
+  - type: 'custom:button-card'
+    template: card_title
+    label: "Sensors"
+
+  # --------------------------------------------------------------------------
+  # Appliances
+  # --------------------------------------------------------------------------
+  - type: horizontal-stack
+    cards:
+      - type: 'custom:button-card'
+        template: card_graph
+        entity: sensor.washing_machine_status
+        variables:
+          ulm_card_graph_color: "var(--google-blue)"
+          ulm_card_graph_name: Washer
+          ulm_card_graph_entity: sensor.washing_machine_power_monitor_energy_power
+          ulm_card_graph_type: fill
+          ulm_card_graph_hours: 24
+          ulm_card_graph_group_by: interval
+      - type: 'custom:button-card'
+        template: card_graph
+        entity: sensor.clothes_dryer_status
+        variables:
+          ulm_card_graph_color: "var(--google-blue)"
+          ulm_card_graph_name: Dryer
+          ulm_card_graph_entity: sensor.dryer_am2301_temperature
+          ulm_card_graph_color2: "var(--google-green)"
+          ulm_card_graph_entity2: sensor.dryer_am2301_humidity
+          ulm_card_graph_type: fill
+          ulm_card_graph_hours: 24
+          ulm_card_graph_group_by: interval
+  
+  - type: 'custom:button-card'
+    template: card_generic_swap
+    entity: sensor.water_softener_status
+    variables:
+      ulm_card_generic_swap_icon: mdi:waves-arrow-up
+
+  - type: 'custom:button-card'
+    template: card_generic_swap
+    entity: binary_sensor.basement_leak_sensor
+    
+
+  - type: 'custom:button-card'
+    template: card_title
+    label: "Settings"
+
+  - type: 'custom:button-card'
+    template: card_input_boolean
+    entity: input_boolean.disable_appliance_notifications
+    variables:
+      ulm_card_input_boolean_name: Disable Appliances Done Announcement
+  
+  - type: 'custom:button-card'
+    template: card_input_boolean
+    entity: input_boolean.alert_low_salt
+    variables:
+      ulm_card_input_boolean_name: Low Softener Salt Alert
+
+  # --------------------------------------------------------------------------
+  # Footer
+  # --------------------------------------------------------------------------
+  - type: 'custom:button-card'
+    template: card_title
+    label: "&copy; 2022 Burton House on Gladstone"

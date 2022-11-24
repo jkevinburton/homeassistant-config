@@ -8,30 +8,36 @@ cards:
       ulm_card_esh_welcome_collapse: input_boolean.minimalist_dropdown
       ulm_weather: "weather.woodstock"
       entity_1:
-        nav: "house"
-        icon: "mdi:home"
-        name: "House"
+        nav: "laundry"
+        icon: "mdi:washing-machine"
+        # name: "Laundry"
         color: "purple"
+        state: 'off'
       entity_2:
         nav: "security"
         icon: "mdi:shield"
-        name: "Secure"
+        # name: "Secure"
         color: "green"
       entity_3:
         nav: "climate"
         icon: "mdi:sun-thermometer-outline"
-        name: "°C"
+        # name: "°C"
         color: "yellow"
       entity_4:
         nav: "network"
         icon: "mdi:nas"
-        name: Lab
+        # name: Lab
         color: "blue"
       entity_5:
-        nav: "network"
-        icon: "mdi:information-outline"
-        name: Info
+        nav: "events"
+        icon: "mdi:calendar"
+        # name: Events
         color: "red"
+
+  # --------------------------------------------------------------------------
+  # Person
+  # --------------------------------------------------------------------------
+
   - type: horizontal-stack
     cards:
       - type: 'custom:button-card'
@@ -79,6 +85,10 @@ cards:
     template: card_title
     name: Rooms
   
+  # --------------------------------------------------------------------------
+  # Rooms
+  # --------------------------------------------------------------------------
+
   - type: horizontal-stack
     cards:
       - type: "custom:button-card"
@@ -87,14 +97,17 @@ cards:
           - yellow_on
         name: Kitchen
         entity: light.mj_kitchen_switch
-        icon: mdi:food
+        icon: mdi:knife
         tap_action:
           action: navigate
           navigation_path: "kitchen"
         variables:
           ulm_custom_card_esh_room_light_entity: light.mj_kitchen_switch
           # ulm_custom_card_esh_room_climate_entity: climate.thermostat
-        label: '[[[ return states["sensor.temperature"].state + "°C" ]]]'
+        label: 'and Dining Room'
+
+      # --------------------------------------------------------------------------
+
       - type: "custom:button-card"
         template:
           - card_esh_room
@@ -108,40 +121,25 @@ cards:
         variables:
           ulm_custom_card_esh_room_light_entity: switch.family_room_main_lights
           # ulm_custom_card_esh_room_climate_entity: climate.thermostat
-        label: '[[[ return states["sensor.temperature"].state + "°C" ]]]'
-  - type: horizontal-stack
-    cards:
-      - type: "custom:button-card"
-        template:
-          - card_esh_room
-          - yellow_on
-        name: Family Room
-        entity: light.mj_kitchen_switch
-        icon: mdi:food
-        tap_action:
-          action: navigate
-          navigation_path: "kitchen"
-        variables:
-          ulm_custom_card_esh_room_light_entity: light.mj_kitchen_switch
-          # ulm_custom_card_esh_room_climate_entity: climate.thermostat
-        label: '[[[ return states["sensor.temperature"].state + "°C" ]]]'
-      - type: "custom:button-card"
-        template:
-          - card_esh_room
-          - yellow_on
-        name: Basement
-        entity: switch.family_room_main_lights
-        icon: mdi:sofa
-        tap_action:
-          action: navigate
-          navigation_path: "familyroom"
-        variables:
-          ulm_custom_card_esh_room_light_entity: switch.family_room_main_lights
-          # ulm_custom_card_esh_room_climate_entity: climate.thermostat
-        label: '[[[ return states["sensor.temperature"].state + "°C" ]]]'
+        # label: '[[[ return states["sensor.temperature"].state + "°C" ]]]'
+        label: 'and Nook'
 
   - type: horizontal-stack
     cards:
+      - type: "custom:button-card"
+        template:
+          - card_esh_room
+          - yellow_on
+        name: Flex Space
+        entity: light.basement_light
+        icon: mdi:teddy-bear
+        tap_action:
+          action: navigate
+          navigation_path: "basement"
+        variables:
+          ulm_custom_card_esh_room_light_entity: light.basement_light
+          # ulm_custom_card_esh_room_climate_entity: climate.thermostat
+        label: "and Kevin's Office"
       - type: "custom:button-card"
         template:
           - card_esh_room
@@ -155,22 +153,54 @@ cards:
         variables:
           ulm_custom_card_esh_room_light_entity: light.flex_room_lights
           # ulm_custom_card_esh_room_climate_entity: climate.thermostat
-        label: '[[[ return states["sensor.temperature"].state + "°C" ]]]'
+        label: 'and Workshop'
+
+  - type: horizontal-stack
+    cards:
       - type: "custom:button-card"
         template:
           - card_esh_room
           - yellow_on
-        name: "Denver's Room"
+        name: Back Stairs
+        entity: switch.back_foyer_lights
+        icon: mdi:stairs
+        tap_action:
+          action: navigate
+          navigation_path: "backstairs"
+        variables:
+          ulm_custom_card_esh_room_light_entity: switch.back_foyer_lights
+          # ulm_custom_card_esh_room_climate_entity: climate.thermostat
+      - type: "custom:button-card"
+        template:
+          - card_esh_room
+          - yellow_on
+        name: Denver
         entity: light.denver_light
-        icon: mdi:account-circle
+        icon: mdi:baseball-diamond
         tap_action:
           action: navigate
           navigation_path: "denver"
         variables:
           ulm_custom_card_esh_room_light_entity: light.denver_light
           # ulm_custom_card_esh_room_climate_entity: climate.thermostat
-        label: '[[[ return "Occupancy: " + states["binary_sensor.denver_room_motion_pir"].state ]]]'
+  
+  - type: "custom:button-card"
+    template: card_light
+    entity: light.charles_bedroom_light
+    variables:
+      ulm_card_light_name: "Charlie's Room"
+      ulm_card_light_enable_popup: false
 
+  - type: horizontal-stack
+    cards:
+      - type: custom:button-card
+        template: card_navigate
+        variables:
+          ulm_card_navigate_path: outside
+          ulm_card_navigate_title: Outside
+          ulm_card_navigate_icon: mdi:campfire
+
+  
   # --------------------------------------------------------------------------
   # Footer
   # --------------------------------------------------------------------------

@@ -1,0 +1,37 @@
+title: "Events"
+path: "events"
+cards:
+  - type: "custom:button-card"
+    template: chip_back
+    variables:
+      ulm_chip_back_path: home
+  
+  - type: 'custom:button-card'
+    template: card_title
+    name: Events
+
+  - type: custom:auto-entities
+    card:
+      type: entities
+      card_mod:
+        style: |
+          ha-card {
+            background-color: transparent;
+            box-shadow: none;
+          }
+    filter:
+      include:
+        - entity_id: sensor.*birthday*
+        - entity_id: sensor.*anniversary*
+        - entity_id: sensor.*countdown*
+    sort:  
+      method: state
+      numeric: true
+    
+
+  # --------------------------------------------------------------------------
+  # Footer
+  # --------------------------------------------------------------------------
+  - type: 'custom:button-card'
+    template: card_title
+    label: "&copy; 2022 Burton House on Gladstone"

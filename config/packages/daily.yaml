@@ -1,0 +1,69 @@
+
+
+automation:
+
+
+  - id: 0d5cea61-f295-4e5d-87a9-f12dfb5b67d6
+    alias: Good Night
+    initial_state: true
+    trigger:
+    - platform: time
+      at: '22:30:00'
+    action:
+      - service: script.reset_annc_switches
+      - service: script.twitter_notify
+        data_template:
+          tweet: >-
+            {{ [ 
+              "Good Night from Burton House on Gladstone. ", 
+              "Time to shut down this party. Good Night from Burton House on Gladstone. ",
+              "I'm feeling tired. Think I'll take a quick nap. Good Night!",
+              "Things are getting quiet. Time to say Good Night.",
+              "We have come to the end of our broadcast day. Oh, who am I kidding. I''ll be up all night watching over Burton House on Gladstone. " 
+              ] | random }}
+  
+  - id: 79886677-4fdb-4cec-ad46-92a9c3c75681
+    alias: Outside Lights on at Sunset
+    initial_state: true
+    trigger:
+    - platform: sun
+      event: sunset
+    action:
+    - service: light.turn_on
+      entity_id: light.outdoor_front_lights
+    - service: switch.turn_on
+      entity_id: switch.driveway_lights_socket_1
+    - service: script.twitter_notify
+      data_template:
+        tweet: >-
+          {{ [ 
+            "Its getting dark at Burton House on Gladstone, so Im turning on the outside and inside lights. ", 
+            "When the Sun goes down, I help out by turning on the lights. Its the little things. ",
+            "Switching to dark mode! The outuisde and inside lights are on.",
+            "It is time to turn on the outside lights. You know...so bugs know where to die.",
+            "Burton House is switching to night mode!",
+            "Burton House is going to the darkside. Of the planet that is. So the lights are on."
+            ] | random }}
+  
+  - id: 18656c32-65ab-4578-9cc0-2de5820290de
+    alias: Outside Lights off at Sunrise
+    initial_state: true
+    trigger:
+    - platform: sun
+      event: sunrise
+    action:
+    - service: light.turn_off
+      entity_id: light.outdoor_front_lights
+    - service: switch.turn_off
+      entity_id: switch.driveway_lights_socket_1
+    - service: script.twitter_notify
+      data_template:
+        tweet: >-
+          {{ [ 
+            "The sun is up at Burton House, so Im turning off the outside lights. ", 
+            "I see the sun! Time to turn off the outside lights at Burton House. ", 
+            "Dawn has broken at Burton House. Turning off the outside lights.",
+            "Burton house has converted to the lightside after a few hours on the darkside. I think its safe to turn off the lights.",
+            "Light mode activated! So that means I'm turning off the outside lights.",
+            "Hooray you live to drink another day. I guess I will get the lights since the sun is up."
+            ] | random }}

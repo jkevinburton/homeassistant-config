@@ -1,0 +1,177 @@
+title: "Kitchen"
+path: "kitchen"
+cards:
+  - type: "custom:button-card"
+    template: chip_back
+    variables:
+      ulm_chip_back_path: home
+  
+  - type: 'custom:button-card'
+    template: card_title
+    name: Kitchen
+    label: and Dining Room
+   
+  - type: 'custom:button-card'
+    template: card_title
+    label: "Lights"
+  
+  - type: horizontal-stack
+    cards:
+      - type: "custom:button-card"
+        template: card_light
+        entity: light.mj_kitchen_switch
+        variables:
+          ulm_card_light_enable_slider: true
+          ulm_card_light_enable_collapse: true
+  
+  - type: horizontal-stack
+    cards:
+      - type: "custom:button-card"
+        template: card_light
+        entity: light.dining_room_lights
+  
+  - type: 'custom:button-card'
+    template: card_title
+    label: "Sensors"
+  
+  # ----------------------------------------------------------
+
+  - type: 'custom:button-card'
+    template: card_binary_sensor_alert
+    variables:
+      ulm_card_binary_sensor_alert: true
+      ulm_show_last_changed: true
+      ulm_card_binary_sensor_alert_name: Kitchen Occupancy
+    entity: binary_sensor.kitchen_occupancy
+
+  - type: conditional
+    conditions:
+      - entity: timer.kitchen_light_timer
+        state_not: "idle"
+    card:
+      type: entities
+      entities:
+        - timer.kitchen_light_timer
+
+  # ----------------------------------------------------------
+
+  - type: 'custom:button-card'
+    template: card_binary_sensor_alert
+    variables:
+      ulm_card_binary_sensor_alert: true
+      ulm_show_last_changed: true
+      ulm_card_binary_sensor_alert_name: Dining Occupancy
+    entity: binary_sensor.dining_room_occupancy
+
+  - type: conditional
+    conditions:
+      - entity: timer.dining_room_light_timer
+        state_not: "idle"
+    card:
+      type: entities
+      entities:
+        - timer.dining_room_light_timer
+  
+  # ----------------------------------------------------------
+
+  - type: horizontal-stack
+    cards:
+      - type: 'custom:button-card'
+        template: card_binary_sensor_alert
+        variables:
+          ulm_card_binary_sensor_alert: true
+          ulm_show_last_changed: true
+          ulm_card_binary_sensor_alert_name: "Kitchen"
+        entity: binary_sensor.kitchen_p1_motion
+      - type: 'custom:button-card'
+        template: card_battery
+        entity: sensor.kitchen_p1_battery
+        variables:
+          ulm_card_battery_battery_level_danger: 20
+          ulm_card_battery_battery_level_warning: 50
+          ulm_card_battery_name: Battery
+  
+  - type: horizontal-stack
+    cards:
+      - type: 'custom:button-card'
+        template: card_binary_sensor_alert
+        variables:
+          ulm_card_binary_sensor_alert: true
+          ulm_show_last_changed: true
+          ulm_card_binary_sensor_alert_name: "Dining"
+        entity: binary_sensor.dining_room_pir
+      - type: 'custom:button-card'
+        template: card_battery
+        entity: sensor.dining_room_pir_battery
+        variables:
+          ulm_card_battery_battery_level_danger: 20
+          ulm_card_battery_battery_level_warning: 50
+          ulm_card_battery_name: Battery
+    
+  - type: horizontal-stack
+    cards:
+      - type: 'custom:button-card'
+        template: card_binary_sensor_alert
+        variables:
+          ulm_card_binary_sensor_alert: true
+          ulm_show_last_changed: false
+          ulm_card_binary_sensor_alert_name: "Microwave"
+        entity: binary_sensor.microwave_cabinet_door
+      - type: 'custom:button-card'
+        template: card_battery
+        entity: sensor.microwave_cabinet_door_battery
+        variables:
+          ulm_card_battery_battery_level_danger: 20
+          ulm_card_battery_battery_level_warning: 50
+          ulm_card_battery_name: Battery
+  
+  - type: horizontal-stack
+    cards:
+      - type: 'custom:button-card'
+        template: card_binary_sensor_alert
+        variables:
+          ulm_card_binary_sensor_alert: true
+          ulm_show_last_changed: false
+          ulm_card_binary_sensor_alert_name: "Front Door"
+        entity: binary_sensor.front_door_contact_sensor
+      - type: 'custom:button-card'
+        template: card_battery
+        entity: sensor.front_door_contact_sensor_battery
+        variables:
+          ulm_card_battery_battery_level_danger: 20
+          ulm_card_battery_battery_level_warning: 50
+          ulm_card_battery_name: Battery
+
+  - type: 'custom:button-card'
+    template: card_title
+    label: "Media"
+
+  - type: "custom:button-card"
+    template: card_media_player
+    entity: media_player.kevin_s_echo_dot
+    variables:
+      ulm_card_media_player_name : Kitchen Echo Dot
+      ulm_card_media_player_enable_art: false
+      ulm_card_media_player_enable_controls: false
+      ulm_card_media_player_enable_volume_slider: true
+      ulm_card_media_player_more_info: true
+
+  # --------------------------------------------------------------------------
+  # Settings
+  # --------------------------------------------------------------------------
+  - type: 'custom:button-card'
+    template: card_title
+    label: "Settings"
+
+  - type: 'custom:button-card'
+    template: card_input_boolean
+    entity: input_boolean.disable_kitchen_motion_automation
+    variables:
+      ulm_card_input_boolean_name: Disable Kitchen Light Automation
+
+  # --------------------------------------------------------------------------
+  # Footer
+  # --------------------------------------------------------------------------
+  - type: 'custom:button-card'
+    template: card_title
+    label: "&copy; 2022 Burton House on Gladstone"

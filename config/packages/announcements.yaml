@@ -2,10 +2,6 @@
 # input_datetime - So the time report automation fires can be set in the UI
 ###############################
 input_datetime:
-  morning_report:
-    name: Morning Report
-    has_date: false
-    has_time: true
   audible_notification_on:
     name: Audible Notifications On
     has_date: false
@@ -27,6 +23,11 @@ input_boolean:
 # ----------------------------------------------------------
 
 script:
+
+  reset_annc_switches:
+    sequence:
+      - service: input_boolean.turn_off
+        entity_id: input_boolean.good_morning_report
 
   morning_briefing:
     sequence:
@@ -69,7 +70,7 @@ automation:
     initial_state: true
     trigger:
       - platform: state
-        entity_id: binary_sensor.main_floor_occupancy
+        entity_id: binary_sensor.kitchen_occupancy
         to: 'on'
     condition:
       - condition: time
@@ -78,8 +79,14 @@ automation:
       - condition: state
         entity_id: input_boolean.good_morning_report
         state: 'off'
+      - condition: state
+        entity_id: input_boolean.guest_mode
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.disable_automations
+        state: 'off'
     action:
-    #- service: script.morning_briefing
+    - service: script.morning_briefing
     - service: script.twitter_notify
       data:
         message: >-

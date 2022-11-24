@@ -1,0 +1,119 @@
+binary_sensor:
+  - platform: group
+    name: "Back Stairs Occupancy"
+    device_class: motion
+    entities:
+      - binary_sensor.back_stairs_motion
+      - binary_sensor.back_door_contact_sensor
+
+input_boolean:
+  disable_back_stairs_motion_automation:
+    name: Disable Back Stairs Motion Automation
+    icon: mdi:arrow-decision-auto
+    initial: false
+
+timer:
+  back_stairs_light_timer:
+    duration: "00:00:10"
+    restore: true
+    icon: mdi:timer
+    name: "Back Stairs Light Timer"
+
+automation:
+  # // Back Stairs
+  - id: 'back_stairs_automatic_lights'
+    alias: 'Back Stairs Auotmatic Lights'
+    description: ''
+    trigger:
+    - platform: event
+      event_type: timer.finished
+      event_data:
+        entity_id: timer.back_stairs_light_timer
+      id: Back Stairs Light Timer Finished
+    - platform: state
+      entity_id:
+      - binary_sensor.back_stairs_occupancy
+      from: 'on'
+      to: 'off'
+      id: Back Stairs Occupancy Cleared
+    - platform: state
+      entity_id:
+      - binary_sensor.back_stairs_occupancy
+      from: 'off'
+      to: 'on'
+      id: Back Stairs Occupancy Detected
+    condition:
+      - condition: state
+        entity_id: input_boolean.guest_mode
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.disable_automations
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.disable_back_stairs_motion_automation
+        state: 'off'
+    action:
+    - choose:
+      - conditions:
+        - condition: trigger
+          id: Back Stairs Occupancy Cleared
+        sequence:
+        - service: timer.start
+          target:
+            entity_id: timer.back_stairs_light_timer
+      - conditions:
+        - condition: trigger
+          id: Back Stairs Occupancy Detected
+        - condition: state
+          entity_id: switch.back_foyer_lights
+          state: 'off'
+        sequence:
+        - service: timer.cancel
+          target:
+            entity_id: timer.back_stairs_light_timer
+        - type: turn_on
+          device_id: c76ca4c82f7c62a7406d51479834767b
+          entity_id: switch.back_foyer_lights
+          domain: switch
+      - conditions:
+        - condition: trigger
+          id: Back Stairs Light Timer Finished
+        sequence:
+        - type: turn_off
+          device_id: c76ca4c82f7c62a7406d51479834767b
+          entity_id: switch.back_foyer_lights
+          domain: switch
+    mode: single
+  
+  # ----------------------------------------------------------
+  - id: disable_back_light_automation_at_night
+    alias: Stop blinding the person at the bottom stairs
+    trigger:
+      - platform: time
+        at: "23:00:00"
+    condition:
+      - condition: state
+        entity_id: input_boolean.guest_mode
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.disable_automations
+        state: 'off'
+    action:
+      - service: input_boolean.turn_on
+        entity_id: input_boolean.disable_back_stairs_motion_automation
+  # ----------------------------------------------------------
+  - id: enable_back_light_automation_at_night
+    alias: Enable the back stairs lights automation in the morning
+    trigger:
+      - platform: time
+        at: "06:00:00"
+    condition:
+      - condition: state
+        entity_id: input_boolean.guest_mode
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.disable_automations
+        state: 'off'
+    action:
+      - service: input_boolean.turn_off
+        entity_id: input_boolean.disable_back_stairs_motion_automation

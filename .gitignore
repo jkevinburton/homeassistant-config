@@ -20,6 +20,7 @@ transporter.py
 /config/zigbee2mqtt/
 /config/custom_components/localtuya/__pycache__/
 /config/components/zones
+/config/image
 !/config/components/zones/.gitkeep
 
 # ignore any of these files no matter where they are using double *

@@ -6,9 +6,15 @@ background: "var(--background-image)"
 views:
   - !include views/home.yaml
   - !include views/house.yaml
-  - !include views/kitchen.yaml
+  - !include views/kitchen_dining.yaml
+  - !include views/back_stairs.yaml
   - !include views/security.yaml
   - !include views/network.yaml
   - !include views/climate.yaml
   - !include views/familyroom.yaml
   - !include views/garage.yaml
+  - !include views/basement.yaml
+  - !include views/laundry.yaml
+  - !include views/denver.yaml
+  - !include views/outside.yaml
+  - !include views/events.yaml

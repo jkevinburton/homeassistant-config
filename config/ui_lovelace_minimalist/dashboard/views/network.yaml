@@ -12,11 +12,7 @@ cards:
   - type: 'custom:button-card'
     template: card_title
     name: The Lab
-  
-  - type: 'custom:button-card'
-    template: card_title
-    label: "Bell Fibe 500"
-  
+    
   - type: custom:button-card
     template: custom_card_irmajavi_speedtest
     variables:
@@ -43,36 +39,36 @@ cards:
   # --------------------------------------------------------------------------
   # Pi Hole
   # --------------------------------------------------------------------------
-  - type: 'custom:button-card'
-    template: card_title
-    label: "Pi-Hole"
+  # - type: 'custom:button-card'
+  #   template: card_title
+  #   label: "Pi-Hole"
   
-  - type: 'custom:button-card'
-    template: card_binary_sensor
-    variables:
-      ulm_card_binary_sensor_alert: false
-      ulm_show_last_changed: false
-    entity: binary_sensor.pi
+  # - type: 'custom:button-card'
+  #   template: card_binary_sensor
+  #   variables:
+  #     ulm_card_binary_sensor_alert: false
+  #     ulm_show_last_changed: false
+  #   entity: binary_sensor.pi
 
-  - type: grid
-    columns: 2
-    square: false
-    cards:
-      - type: 'custom:button-card'
-        template: card_generic_swap
-        entity: sensor.pi_dns_queries_today
-        variables:
-          ulm_card_generic_swap_name: Queries
-      - type: 'custom:button-card'
-        template: card_generic_swap
-        entity: sensor.pi_ads_blocked_today
-        variables:
-          ulm_card_generic_swap_name: Blocked
-      - type: 'custom:button-card'
-        template: card_generic_swap
-        entity: sensor.pi_domains_blocked
-        variables:
-          ulm_card_generic_swap_name: Monitoring
+  # - type: grid
+  #   columns: 2
+  #   square: false
+  #   cards:
+  #     - type: 'custom:button-card'
+  #       template: card_generic_swap
+  #       entity: sensor.pi_dns_queries_today
+  #       variables:
+  #         ulm_card_generic_swap_name: Queries
+  #     - type: 'custom:button-card'
+  #       template: card_generic_swap
+  #       entity: sensor.pi_ads_blocked_today
+  #       variables:
+  #         ulm_card_generic_swap_name: Blocked
+  #     - type: 'custom:button-card'
+  #       template: card_generic_swap
+  #       entity: sensor.pi_domains_blocked
+  #       variables:
+  #         ulm_card_generic_swap_name: Monitoring
 
   
   # --------------------------------------------------------------------------

@@ -16,6 +16,12 @@ mqtt:
       state_topic: "tele/house/alexa/lastloc"
       icon: mdi:text
 
+input_boolean:
+  disable_appliance_notifications:
+    name: Disable Appliance Notifications
+    icon: mdi:arrow-decision-auto
+    initial: false
+
 sensor:
   - platform: template
     sensors:
@@ -87,34 +93,7 @@ sensor:
 
 automation:
   # -----------------------------------------------------------
-  - id: turn_on_outdoor_lights
-    alias: Turn ON outdoor lights
-    initial_state: true
-    trigger:
-      - platform: sun
-        event: sunset
-    action:
-      #      - service: light.turn_on
-      #        entity_id: light.outdoor_oasis_lights
-      - service: light.turn_on
-        entity_id: light.outdoor_front_lights
-      - service: switch.turn_on
-        entity_id: switch.driveway_lights_socket_1
-  # -----------------------------------------------------------
-  - id: turn_off_outdoor_lights
-    alias: Turn OFF outdoor lights
-    initial_state: true
-    trigger:
-      - platform: sun
-        event: sunrise
-    action:
-      #      - service: light.turn_off
-      #        entity_id: light.outdoor_oasis_lights
-      - service: light.turn_off
-        entity_id: light.outdoor_front_lights
-      - service: switch.turn_off
-        entity_id: switch.driveway_lights_socket_1
-  # -----------------------------------------------------------
+
   - id: water_leak_detected_laundry_room
     alias: Notify when flood is detected
     trigger:
@@ -136,7 +115,11 @@ automation:
     action:
       - service: script.kitchen_leak_detected
     initial_state: true
-  # -----------------------------------------------------------
+  
+  # --------------------------------------------------------------------------
+  # Washer
+  # --------------------------------------------------------------------------
+
   - id: set_washer_state_running
     alias: Set washing machine state when when running
     trigger:
@@ -147,7 +130,7 @@ automation:
       - service: mqtt.publish
         data:
           topic: tele/house/washing_machine/status
-          payload: running
+          payload: "Washing"
           retain: true
     initial_state: true
   # -----------------------------------------------------------
@@ -162,23 +145,27 @@ automation:
     condition:
       - condition: state
         entity_id: sensor.washing_machine_status
-        state: running
+        state: "Washing"
     action:
       - service: mqtt.publish
         data:
           topic: tele/house/washing_machine/status
-          payload: done
+          payload: "Completed"
           retain: true
       - service: script.washing_machine_done
       - delay:
-          minutes: 5
+          minutes: 10
       - service: mqtt.publish
         data:
           topic: tele/house/washing_machine/status
-          payload: idle
+          payload: "Not Running"
           retain: true
     initial_state: true
-  # -----------------------------------------------------------
+  
+  # --------------------------------------------------------------------------
+  # Dryer
+  # --------------------------------------------------------------------------
+
   - id: set_dryer_running
     alias: Set clothes dryer state when running
     trigger:
@@ -190,10 +177,10 @@ automation:
       conditions:
         - condition: state
           entity_id: sensor.clothes_dryer_status
-          state: idle
+          state: "Not Running"
         - condition: state
           entity_id: sensor.clothes_dryer_status
-          state: dry
+          state: "Expected Dry"
         - condition: state
           entity_id: sensor.clothes_dryer_status
           state: unknown
@@ -201,7 +188,7 @@ automation:
       - service: mqtt.publish
         data:
           topic: tele/house/clothes_dryer/status
-          payload: running
+          payload: "Drying"
           retain: true
     initial_state: true
   # -----------------------------------------------------------
@@ -216,7 +203,7 @@ automation:
       conditions:
         - condition: state
           entity_id: sensor.clothes_dryer_status
-          state: running
+          state: "Drying"
         - condition: numeric_state
           entity_id: sensor.dryer_am2301_temperature
           above: 32
@@ -224,18 +211,22 @@ automation:
       - service: mqtt.publish
         data:
           topic: tele/house/clothes_dryer/status
-          payload: dry
+          payload: "Expected Dry"
           retain: true
       - service: script.clothes_dryer_done
       - delay:
-          minutes: 5
+          minutes: 10
       - service: mqtt.publish
         data:
           topic: tele/house/clothes_dryer/status
-          payload: idle
+          payload: "Not Running"
           retain: true
     initial_state: true
   
+  # --------------------------------------------------------------------------
+  # Microwave Cabinet
+  # --------------------------------------------------------------------------
+
   - id: turn_on_power_to_microwave
     alias: Turn ON power to Microwave when cabinet door open
     trigger:
@@ -287,12 +278,24 @@ script:
               - condition: state
                 entity_id: sensor.clothes_dryer_status
                 state: running
+              - condition: state
+                entity_id: input_boolean.disable_appliance_notifications
+                state: 'off'
             sequence:
               - service: script.text_notify
                 data_template:
                   who: "parents"
                   message: "I have been told the washer is done, but the dryer is still running, should be ready soon."
         default:
+          - condition: state
+            entity_id: input_boolean.disable_appliance_notifications
+            state: 'off'
+          - condition: state
+            entity_id: input_boolean.guest_mode
+            state: 'off'
+          - condition: state
+            entity_id: input_boolean.disable_automations
+            state: 'off'
           - service: script.text_notify
             data_template:
               who: "parents"
@@ -301,6 +304,15 @@ script:
   # // dryer is done
   clothes_dryer_done:
     sequence:
+      - condition: state
+        entity_id: input_boolean.disable_appliance_notifications
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.guest_mode
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.disable_automations
+        state: 'off'
       - service: script.text_notify
         data_template:
           who: "parents"
