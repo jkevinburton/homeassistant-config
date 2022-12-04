@@ -20,12 +20,16 @@ input_boolean:
 # ----------------------------------------------------------
 
 group:
+
   family_room_reading_lights:
     name: Reading Lights
     icon: mdi:track-light
     entities:
       - light.reading_lights_left
       - light.reading_lights_right
+
+# ----------------------------------------------------------
+# ----------------------------------------------------------
 
 template:
   - binary_sensor:
@@ -43,6 +47,35 @@ timer:
     restore: true
     icon: mdi:timer
     name: "Family Room Light Timer"
+
+# ----------------------------------------------------------
+# ----------------------------------------------------------
+
+script:
+
+  turn_on_family_room_lights:
+    sequence:
+      - condition: and
+        conditions:
+          - condition: state
+            entity_id: switch.pot_lights
+            state: 'off'
+          - condition: time
+            after: '07:30:00'
+            before: '22:30:00'
+          - condition: numeric_state
+            entity_id: sensor.family_room_p1_motion_illuminance
+            below: 100
+      - service: switch.turn_on
+        entity_id: switch.pot_lights
+
+  turn_off_family_room_lights:
+    sequence:
+      - condition: state
+        entity_id: switch.pot_lights
+        state: 'on'
+      - service: switch.turn_off
+        entity_id: switch.pot_lights
 
 # ----------------------------------------------------------
 # ----------------------------------------------------------
@@ -97,24 +130,10 @@ automation:
           data: {}
           target:
             entity_id: timer.family_room_light_timer
-        - type: turn_on
-          device_id: cc1d59c6ebdeb959b70242cb0b81fd25
-          entity_id: switch.family_room_main_lights
-          domain: switch
+        - service: script.turn_on_family_room_lights
       - conditions:
         - condition: trigger
           id: Family Room Light Timer Finished
-        # endure that we haven't disabled the automation for any reason
-        - condition: state
-          entity_id: input_boolean.disable_family_room_motion_automation
-          state: 'off'
-        # ensure that the lights were on before trying to turn them off
-        - condition: state
-          entity_id: switch.family_room_main_lights
-          state: 'on'
         sequence:
-        - type: turn_off
-          device_id: cc1d59c6ebdeb959b70242cb0b81fd25
-          entity_id: switch.family_room_main_lights
-          domain: switch
+        - service: script.turn_off_family_room_lights
     mode: single

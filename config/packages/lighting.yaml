@@ -1,24 +1,4 @@
 
-
-input_number:
-  lights_night_mode:
-    name: Lights Night Mode
-    initial: 15
-    min: 5
-    max: 20
-  lights_regular_mode:
-    name: Lights Regular Mode
-    initial: 60
-    min: 20
-    max: 100
-  light_timeout:
-    name: Light Timeout
-    initial: 300
-    min: 60
-    max: 6000
-  
-
-
 automation:
   - id: test_aqara_button
     alias: Test Awara Button
@@ -34,5 +14,3 @@ automation:
       - service: switch.toggle
         entity_id: switch.family_room_main_lights
   
-
-

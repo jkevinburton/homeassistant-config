@@ -86,7 +86,7 @@ automation:
         entity_id: input_boolean.disable_automations
         state: 'off'
     action:
-    - service: script.morning_briefing
+    # - service: script.morning_briefing
     - service: script.twitter_notify
       data:
         message: >-

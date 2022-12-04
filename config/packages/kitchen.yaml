@@ -43,6 +43,8 @@ timer:
 
 automation:
 
+  # Kitchen lights needed when dark and there is motion
+
   - id: 'kitchen_automatic_lights'
     alias: 'Kitchen Auotmatic Lights'
     description: ''
@@ -76,6 +78,8 @@ automation:
         state: 'off'
     action:
     - choose:
+      
+      # motion cleared, start the countdown to turn off the lights
       - conditions:
         - condition: trigger
           id: Kitchen Occupancy Cleared
@@ -83,6 +87,8 @@ automation:
         - service: timer.start
           target:
             entity_id: timer.kitchen_light_timer
+
+      # motion detected, turn on the lights
       - conditions:
         - condition: trigger
           id: Kitchen Occupancy Detected
@@ -90,18 +96,33 @@ automation:
         - service: timer.cancel
           target:
             entity_id: timer.kitchen_light_timer
-        - type: turn_on
-          device_id: 97341e70aeb877d7d79b219677b6a699
-          entity_id: light.mj_kitchen_switch
-          domain: light
+        - service: script.turn_on_kitchen_lights
+
+      # timer finished, turn off the lights if someone didn't already do it.
       - conditions:
         - condition: trigger
           id: Kitchen Light Timer Finished
         sequence:
-        - type: turn_off
-          device_id: 97341e70aeb877d7d79b219677b6a699
-          entity_id: light.mj_kitchen_switch
-          domain: light
+          - service: script.turn_off_kitchen_lights
     mode: single
-  
+
+script:
+
+  turn_on_kitchen_lights:
+    sequence:
+      - condition: state
+        entity_id: light.mj_kitchen_switch
+        state: 'off'
+      - service: light.turn_on
+        entity_id: light.mj_kitchen_switch
+
+
+  turn_off_kitchen_lights:
+    sequence:
+      - condition: state
+        entity_id: light.mj_kitchen_switch
+        state: 'on'
+      - service: light.turn_off
+        entity_id: light.mj_kitchen_switch
+
   

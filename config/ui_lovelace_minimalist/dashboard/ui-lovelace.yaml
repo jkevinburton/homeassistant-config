@@ -18,3 +18,5 @@ views:
   - !include views/denver.yaml
   - !include views/outside.yaml
   - !include views/events.yaml
+  - !include views/upstairs.yaml
+  - !include views/settings.yaml

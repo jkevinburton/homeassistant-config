@@ -35,15 +35,40 @@ template:
 # ----------------------------------------------------------
 # ----------------------------------------------------------
 
-# ----------------------------------------------------------
-# ----------------------------------------------------------
-
 timer:
   basement_light_timer:
     duration: "00:05:00"
     restore: true
     icon: mdi:timer
     name: "Basement Light Timer"
+
+
+# ----------------------------------------------------------
+# ----------------------------------------------------------
+
+script:
+
+  turn_on_basement_lights:
+    sequence:
+      - condition: and
+        conditions:
+          - condition: state
+            entity_id: light.basement_light
+            state: 'off'
+          - condition: time
+            after: '07:00:00'
+            before: '22:30:00'
+      - service: light.turn_on
+        entity_id: light.basement_light
+
+  turn_off_basement_lights:
+    sequence:
+      - condition: state
+        entity_id: light.basement_light
+        state: 'on'
+      - service: light.turn_off
+        entity_id: light.basement_light
+
 
 # ----------------------------------------------------------
 # ----------------------------------------------------------
@@ -93,24 +118,15 @@ automation:
       - conditions:
         - condition: trigger
           id: Basement Occupancy Detected
-        - condition: state
-          entity_id: input_boolean.guest_mode
-          state: 'off'
         sequence:
         - service: timer.cancel
           data: {}
           target:
             entity_id: timer.basement_light_timer
-        - type: turn_on
-          device_id: 307b59b49203e5337d5e42478de268a1
-          entity_id: light.basement_light
-          domain: light
+        - service: script.turn_on_basement_lights
       - conditions:
         - condition: trigger
           id: Basement Light Timer Finished
         sequence:
-        - type: turn_off
-          device_id: 307b59b49203e5337d5e42478de268a1
-          entity_id: light.basement_light
-          domain: light
+        - service: script.turn_off_basement_lights
     mode: single

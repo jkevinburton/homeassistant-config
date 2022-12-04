@@ -1,0 +1,64 @@
+title: "Up Stairs"
+path: "upstairs"
+cards:
+  - type: "custom:button-card"
+    template: chip_back
+    variables:
+      ulm_chip_back_path: home
+  
+  - type: 'custom:button-card'
+    template: card_title
+    name: Up Stairs
+    label: Hallway
+  
+  - type: 'custom:button-card'
+    template: card_title
+    label: "Lights"
+    
+  - type: horizontal-stack
+    cards:
+      - type: "custom:button-card"
+        template: card_light
+        entity: switch.hallway_light
+  
+  - type: 'custom:button-card'
+    template: card_title
+    label: "Sensors"
+    
+  - type: horizontal-stack
+    cards:
+      - type: 'custom:button-card'
+        template: card_binary_sensor_alert
+        variables:
+          ulm_card_binary_sensor_alert: true
+          ulm_show_last_changed: true
+          ulm_card_binary_sensor_alert_name: Hallway Motion
+        entity: binary_sensor.upstairs_hallway_pir
+  - type: conditional
+    conditions:
+      - entity: timer.hallway_light_timer
+        state_not: "idle"
+    card:
+      type: entities
+      entities:
+        - timer.hallway_light_timer
+      
+  # --------------------------------------------------------------------------
+  # Settings
+  # --------------------------------------------------------------------------
+  - type: 'custom:button-card'
+    template: card_title
+    label: "Settings"
+
+  - type: 'custom:button-card'
+    template: card_input_boolean
+    entity: input_boolean.disable_hallway_motion_automation
+    variables:
+      ulm_card_input_boolean_name: Disable Hallway Light Automation
+
+  # --------------------------------------------------------------------------
+  # Footer
+  # --------------------------------------------------------------------------
+  - type: 'custom:button-card'
+    template: card_title
+    label: "&copy; 2022 Burton House on Gladstone"

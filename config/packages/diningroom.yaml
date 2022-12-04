@@ -20,11 +20,40 @@ input_boolean:
 
 timer:
   dining_room_light_timer:
-    duration: "00:02:00"
+    duration: "00:05:00"
     restore: true
     icon: mdi:timer
     name: "Dining Room Light Timer"
   
+# ----------------------------------------------------------
+# ----------------------------------------------------------
+
+script:
+
+  turn_on_dining_lights:
+    sequence:
+      - condition: and
+        conditions:
+          - condition: state
+            entity_id: light.dining_room_lights
+            state: 'off'
+          - condition: time
+            after: '07:00:00'
+            before: '22:30:00'
+          # since kitchen and dining room are in the same area, lets use the LUX sensor from the Kitchen P1 Sensor  
+          - condition: numeric_state
+            entity_id: sensor.kitchen_p1_illuminance
+            below: 100
+      - service: light.turn_on
+        entity_id: light.dining_room_lights
+
+  turn_off_dining_lights:
+    sequence:
+      - condition: state
+        entity_id: light.dining_room_lights
+        state: 'on'
+      - service: light.turn_off
+        entity_id: light.dining_room_lights
 
 # ----------------------------------------------------------
 # ----------------------------------------------------------
@@ -78,18 +107,12 @@ automation:
         - service: timer.cancel
           target:
             entity_id: timer.dining_room_light_timer
-        - type: turn_on
-          device_id: 274788903ca15b7328fa94bab5b505e2
-          entity_id: light.dining_room_lights
-          domain: light
+        - service: script.turn_on_dining_lights
       - conditions:
         - condition: trigger
           id: Dining Room Light Timer Finished
         sequence:
-        - type: turn_off
-          device_id: 274788903ca15b7328fa94bab5b505e2
-          entity_id: light.dining_room_lights
-          domain: light
+          - service: script.turn_off_dining_lights
     mode: single
-  
-  
+
+

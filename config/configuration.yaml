@@ -72,6 +72,7 @@ script: !include scripts.yaml
 sensor: !include_dir_merge_list sensors
 binary_sensor: !include_dir_merge_list binary_sensors
 # light: !include lights.yaml
+mqtt: !include mqtt.yaml
 switch: !include switches.yaml
 scene: !include scenes.yaml
 input_select: !include input_select.yaml

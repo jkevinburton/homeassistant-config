@@ -1,17 +1,7 @@
-binary_sensor:
-  - platform: group
-    name: "Back Stairs Occupancy"
-    device_class: motion
-    entities:
-      - binary_sensor.back_stairs_motion
-      - binary_sensor.back_door_contact_sensor
-
-# ----------------------------------------------------------
-# ----------------------------------------------------------
 
 input_boolean:
-  disable_back_stairs_motion_automation:
-    name: Disable Back Stairs Motion Automation
+  disable_hallway_motion_automation:
+    name: Disable Hallway Motion Automation
     icon: mdi:arrow-decision-auto
     initial: false
 
@@ -19,68 +9,68 @@ input_boolean:
 # ----------------------------------------------------------
 
 timer:
-  back_stairs_light_timer:
+  hallway_light_timer:
     duration: "00:00:10"
     restore: true
     icon: mdi:timer
-    name: "Back Stairs Light Timer"
+    name: "Hallway Light Timer"
 
 # ----------------------------------------------------------
 # ----------------------------------------------------------
 
 script:
 
-  turn_on_back_stairs_lights:
+  turn_on_hallway_lights:
     sequence:
       - condition: and
         conditions:
           - condition: state
-            entity_id: switch.back_foyer_lights
+            entity_id: switch.hallway_light
             state: 'off'
           - condition: time
             after: '07:00:00'
             before: '22:30:00'
-          # since kitchen and back stairs are in the same area, lets use the LUX sensor from the Kitchen P1 Sensor  
+          # since kitchen and stairs are in the same area, lets use the LUX sensor from the Kitchen P1 Sensor  
           - condition: numeric_state
             entity_id: sensor.kitchen_p1_illuminance
             below: 100
       - service: switch.turn_on
-        entity_id: switch.back_foyer_lights
+        entity_id: switch.hallway_light
 
-  turn_off_back_stairs_lights:
+  turn_off_hallway_lights:
     sequence:
       - condition: state
-        entity_id: switch.back_foyer_lights
+        entity_id: switch.hallway_light
         state: 'on'
       - service: switch.turn_off
-        entity_id: switch.back_foyer_lights
+        entity_id: switch.hallway_light
 
 # ----------------------------------------------------------
 # ----------------------------------------------------------
 
 automation:
-  # // Back Stairs
-  - id: 'back_stairs_automatic_lights'
-    alias: 'Back Stairs Auotmatic Lights'
+  # // Hallway Stairs
+  - id: 'hallway_automatic_lights'
+    alias: 'Hallway Auotmatic Lights'
     description: ''
     trigger:
     - platform: event
       event_type: timer.finished
       event_data:
-        entity_id: timer.back_stairs_light_timer
-      id: Back Stairs Light Timer Finished
+        entity_id: timer.hallway_light_timer
+      id: Hallway Light Timer Finished
     - platform: state
       entity_id:
-      - binary_sensor.back_stairs_occupancy
+      - binary_sensor.upstairs_hallway_pir
       from: 'on'
       to: 'off'
-      id: Back Stairs Occupancy Cleared
+      id: Hallway Occupancy Cleared
     - platform: state
       entity_id:
-      - binary_sensor.back_stairs_occupancy
+      - binary_sensor.upstairs_hallway_pir
       from: 'off'
       to: 'on'
-      id: Back Stairs Occupancy Detected
+      id: Hallway Occupancy Detected
     condition:
       - condition: state
         entity_id: input_boolean.guest_mode
@@ -89,28 +79,28 @@ automation:
         entity_id: input_boolean.disable_automations
         state: 'off'
       - condition: state
-        entity_id: input_boolean.disable_back_stairs_motion_automation
+        entity_id: input_boolean.disable_hallway_motion_automation
         state: 'off'
     action:
     - choose:
       - conditions:
         - condition: trigger
-          id: Back Stairs Occupancy Cleared
+          id: Hallway Occupancy Cleared
         sequence:
         - service: timer.start
           target:
-            entity_id: timer.back_stairs_light_timer
+            entity_id: timer.hallway_light_timer
       - conditions:
         - condition: trigger
-          id: Back Stairs Occupancy Detected
+          id: Hallway Occupancy Detected
         sequence:
         - service: timer.cancel
           target:
-            entity_id: timer.back_stairs_light_timer
-        - service: script.turn_on_back_stairs_lights
+            entity_id: timer.hallway_light_timer
+        - service: script.turn_on_hallway_lights
       - conditions:
         - condition: trigger
-          id: Back Stairs Light Timer Finished
+          id: Hallway Light Timer Finished
         sequence:
-        - service: script.turn_off_back_stairs_lights
+        - service: script.turn_off_hallway_lights
     mode: single
