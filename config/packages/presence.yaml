@@ -2,7 +2,7 @@ sensor:
   # One entry for each beacon you want to track
   - platform: mqtt_room
     device_id: "apple:1006:10-7"
-    name: "Kevin iPhone 12 Mini BLE"
+    name: "Kevin BLE"
     state_topic: "espresense/rooms"
     timeout: 60
     away_timeout: 120 # number of seconds after which the enitity will get status not_home
@@ -12,8 +12,8 @@ template:
       - name: "Kevin is working"
         icon: mdi:laptop-account
         state: >
-          {{ is_state('sensor.kevin_iphone_12_mini_ble', 'office') }}
-      - name: "Theatre Mode"
+          {{ is_state('sensor.kevin_ble', 'flex_space') }}
+      - name: "Family Room TV"
         icon: mdi:television
         state: >
           {{ is_state('remote.58_hisense_roku_tv', 'on') }}
