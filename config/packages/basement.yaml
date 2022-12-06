@@ -7,6 +7,11 @@ binary_sensor:
       - binary_sensor.basement_pir
       - binary_sensor.kevin_is_working
       - binary_sensor.basement_tv
+  - platform: group
+    name: "Work Time"
+    entities:
+      - binary_sensor.workday_sensor
+      - binary_sensor.worktime_sensor
 
 # ----------------------------------------------------------
 # ----------------------------------------------------------
@@ -105,6 +110,9 @@ automation:
         state: 'off'
       - condition: state
         entity_id: input_boolean.disable_automations
+        state: 'off'
+      - condition: state
+        entity_id: binary_sensor.work_time
         state: 'off'
     action:
     - choose:

@@ -1,12 +1,29 @@
 sensor:
   # One entry for each beacon you want to track
   - platform: mqtt_room
-    device_id: "apple:1006:10-7"
-    name: "Kevin BLE"
+    device_id: "irk:74e58c76da4bd13d46d40bc813a6d5ab"
+    name: "Kevin BLE" # confirmed
     state_topic: "espresense/rooms"
-    timeout: 60
-    away_timeout: 120 # number of seconds after which the enitity will get status not_home
-  
+    timeout: 10
+    away_timeout: 120
+
+  - platform: mqtt_room
+    device_id: "Denver-iPhone11"
+    # device_id: "irk:4e2d7cd91b6b4f4062c739098dacb3d2"
+    name: "Denver BLE"
+    state_topic: "espresense/rooms"
+    timeout: 10
+    away_timeout: 120
+
+  - platform: mqtt_room
+    device_id: "tamara-ble"
+    # device_id: "irk:275eac9322e70b1882babc1e092f0cd8"
+    name: "Tamara BLE"
+    state_topic: "espresense/rooms"
+    timeout: 10
+    away_timeout: 120
+
+
 template:
   - binary_sensor:
       - name: "Kevin is working"

@@ -81,6 +81,16 @@ cards:
   #     language: 'en'
 
 
+  - type: conditional
+    conditions:
+      - entity: sensor.school_lunch
+        state_not: Nothing
+    card:
+      type: entity
+      entity: sensor.school_lunch
+      name: Denver's school lunch is...
+      icon: mdi:food
+
   - type: 'custom:button-card'
     template: card_title
     name: Areas

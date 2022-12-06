@@ -62,7 +62,7 @@ script:
             state: 'off'
           - condition: time
             after: '07:30:00'
-            before: '22:30:00'
+            before: '23:00:00'
           - condition: numeric_state
             entity_id: sensor.family_room_p1_motion_illuminance
             below: 100

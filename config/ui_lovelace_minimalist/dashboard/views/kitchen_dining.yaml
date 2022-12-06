@@ -146,15 +146,31 @@ cards:
     template: card_title
     label: "Media"
 
-  - type: "custom:button-card"
-    template: card_media_player
+  - type: custom:mini-media-player
     entity: media_player.kevin_s_echo_dot
-    variables:
-      ulm_card_media_player_name : Kitchen Echo Dot
-      ulm_card_media_player_enable_art: false
-      ulm_card_media_player_enable_controls: false
-      ulm_card_media_player_enable_volume_slider: true
-      ulm_card_media_player_more_info: true
+    name: Kitchen Media Player
+    artwork: full-cover-fit
+    shortcuts:
+      columns: 2
+      buttons:
+        - type: custom
+          name: West49
+          id: play West49 Master Playlist on Apple Music
+          icon: mdi:music-box-multiple
+        - type: custom
+          name: Heart FM
+          id: play Heart FM on tunein
+          icon: mdi:radio
+    hide:
+      volume: true
+      power: true
+      source: true
+      name: false
+      info: true
+      controls: true
+      progress: true
+      icon: false
+      state_label: true
 
   # --------------------------------------------------------------------------
   # Settings

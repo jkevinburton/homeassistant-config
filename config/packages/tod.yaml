@@ -28,3 +28,8 @@ binary_sensor:
     name: "Evening"
     after: "17:00"
     before: "23:00"
+
+  - platform: tod
+    name: "Worktime Sensor"
+    after: "10:00:00"
+    before: "23:00:00"

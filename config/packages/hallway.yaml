@@ -28,12 +28,12 @@ script:
             entity_id: switch.hallway_light
             state: 'off'
           - condition: time
-            after: '07:00:00'
+            after: '09:00:00'
             before: '22:30:00'
           # since kitchen and stairs are in the same area, lets use the LUX sensor from the Kitchen P1 Sensor  
           - condition: numeric_state
             entity_id: sensor.kitchen_p1_illuminance
-            below: 100
+            below: 50
       - service: switch.turn_on
         entity_id: switch.hallway_light
 
