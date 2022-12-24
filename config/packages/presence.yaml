@@ -22,22 +22,32 @@ sensor:
     state_topic: "espresense/rooms"
     timeout: 10
     away_timeout: 120
+  
+  - platform: mqtt_room
+    device_id: "charles-ipad"
+    # device_id: "irk:125003a617c85c09d69f4376235f4550"
+    name: "Charles BLE"
+    state_topic: "espresense/rooms"
+    timeout: 10
+    away_timeout: 120
+  
+  - platform: mqtt_room
+    device_id: "keaton-phone"
+    # device_id: "irk:2b9620886d67f3c3f8cc2b9b9401dac2"
+    name: "Keaton BLE"
+    state_topic: "espresense/rooms"
+    timeout: 10
+    away_timeout: 120
+
+
 
 
 template:
   - binary_sensor:
-      - name: "Kevin is working"
-        icon: mdi:laptop-account
-        state: >
-          {{ is_state('sensor.kevin_ble', 'flex_space') }}
       - name: "Family Room TV"
         icon: mdi:television
         state: >
           {{ is_state('remote.58_hisense_roku_tv', 'on') }}
-      - name: "Basement TV"
-        icon: mdi:television
-        state: >
-          {{ is_state('media_player.living_room', 'playing') }}
 
 
 

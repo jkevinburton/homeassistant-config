@@ -41,6 +41,34 @@ timer:
 # ----------------------------------------------------------
 # ----------------------------------------------------------
 
+script:
+
+  turn_on_kitchen_lights:
+    sequence:
+      - condition: state
+        entity_id: light.mj_kitchen_switch
+        state: 'off'
+      - condition: time
+        after: '06:00:00'
+        before: '22:30:00'
+      - service: light.turn_on
+        entity_id: light.mj_kitchen_switch
+        data:
+          brightness: 180
+
+
+  turn_off_kitchen_lights:
+    sequence:
+      - condition: state
+        entity_id: light.mj_kitchen_switch
+        state: 'on'
+      - service: light.turn_off
+        entity_id: light.mj_kitchen_switch
+
+  
+# ----------------------------------------------------------
+# ----------------------------------------------------------
+
 automation:
 
   # Kitchen lights needed when dark and there is motion
@@ -62,7 +90,7 @@ automation:
       id: Kitchen Occupancy Cleared
     - platform: state
       entity_id:
-      - binary_sensor.kitchen_occupancy
+      - binary_sensor.kitchen_p1_motion
       from: 'off'
       to: 'on'
       id: Kitchen Occupancy Detected
@@ -105,24 +133,3 @@ automation:
         sequence:
           - service: script.turn_off_kitchen_lights
     mode: single
-
-script:
-
-  turn_on_kitchen_lights:
-    sequence:
-      - condition: state
-        entity_id: light.mj_kitchen_switch
-        state: 'off'
-      - service: light.turn_on
-        entity_id: light.mj_kitchen_switch
-
-
-  turn_off_kitchen_lights:
-    sequence:
-      - condition: state
-        entity_id: light.mj_kitchen_switch
-        state: 'on'
-      - service: light.turn_off
-        entity_id: light.mj_kitchen_switch
-
-  

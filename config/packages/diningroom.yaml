@@ -20,7 +20,7 @@ input_boolean:
 
 timer:
   dining_room_light_timer:
-    duration: "00:05:00"
+    duration: "00:15:00"
     restore: true
     icon: mdi:timer
     name: "Dining Room Light Timer"
@@ -40,10 +40,6 @@ script:
           - condition: time
             after: '07:00:00'
             before: '22:30:00'
-          # since kitchen and dining room are in the same area, lets use the LUX sensor from the Kitchen P1 Sensor  
-          - condition: numeric_state
-            entity_id: sensor.kitchen_p1_illuminance
-            below: 100
       - service: light.turn_on
         entity_id: light.dining_room_lights
 
@@ -77,7 +73,7 @@ automation:
       id: Dining Room Occupancy Cleared
     - platform: state
       entity_id:
-      - binary_sensor.dining_room_occupancy
+      - binary_sensor.dining_room_pir
       from: 'off'
       to: 'on'
       id: Dining Room Occupancy Detected

@@ -7,3 +7,17 @@ input_boolean:
     name: Guest Mode
     icon: mdi:account-group
     initial: false
+
+sensor:
+  - platform: template
+    sensors:
+      indoor_temperature:
+        friendly_name: "Indoor Temperature"
+        value_template: "{{ state_attr('climate.thermostat', 'current_temperature') }}"
+        unit_of_measurement: "°C"
+        device_class: temperature
+      indoor_humidity:
+        friendly_name: "Indoor Humidity"
+        value_template: "{{ state_attr('climate.thermostat', 'current_humidity') }}"
+        unit_of_measurement: "%"
+        device_class: humidity

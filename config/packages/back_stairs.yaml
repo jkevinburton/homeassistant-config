@@ -77,7 +77,7 @@ automation:
       id: Back Stairs Occupancy Cleared
     - platform: state
       entity_id:
-      - binary_sensor.back_stairs_occupancy
+      - binary_sensor.back_stairs_motion
       from: 'off'
       to: 'on'
       id: Back Stairs Occupancy Detected

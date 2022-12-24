@@ -33,7 +33,7 @@ script:
           # since kitchen and stairs are in the same area, lets use the LUX sensor from the Kitchen P1 Sensor  
           - condition: numeric_state
             entity_id: sensor.kitchen_p1_illuminance
-            below: 50
+            below: 100
       - service: switch.turn_on
         entity_id: switch.hallway_light
 

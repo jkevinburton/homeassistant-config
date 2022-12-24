@@ -1,3 +1,10 @@
+template:
+  - binary_sensor:
+      - name: "Denver Upstairs"
+        icon: mdi:laptop-account
+        state: >
+          {{ is_state('sensor.denver_ble', 'upstairs') }}
+
 binary_sensor:
   - platform: group
     name: "Denver Bedroom Occupancy"
@@ -17,102 +24,138 @@ input_boolean:
 # ----------------------------------------------------------
 # ----------------------------------------------------------
 
-automation:
-  # ----------------------------------------------------------
-  # - id: turn_on_denver_bedroom_lights_when_occupancy_detected
-  #   alias: Turn ON Denver Bedroom lights when occupancy detected
-  #   trigger:
-  #     - platform: state
-  #       entity_id: binary_sensor.denver_bedroom_occupancy
-  #       from: 'off'
-  #       to: 'on'
-  #   condition:
-  #     - condition: state
-  #       entity_id: light.denver_light
-  #       state: 'off'
-  #     - condition: state
-  #       entity_id: input_boolean.guest_mode
-  #       state: 'off'
-  #     - contidition: state
-  #       entity_id: input_boolean.disable_denver_bedroom_motion_automation
-  #       state: 'off'
-  #   action:
-  #     - service: light.turn_on
-  #       entity_id: light.denver_light
-  #   mode: single
-  # ----------------------------------------------------------
-  - id: notify_denver_his_lights are about to turn off
-    alias: Notify Denver his lights are about to turn off
-    trigger:
-      - platform: state
-        entity_id: binary_sensor.denver_bedroom_occupancy
-        from: 'on'
-        to: 'off'
-        for:
-          hours: 0
-          minutes: 5 # do not use default, Denver does allot of sedetary stuff //"{{ states('input_number.light_timeout') | int }}"
-          seconds: 0
-    condition:
-      - condition: state
-        entity_id: binary_sensor.denver_bedroom_occupancy
-        state: 'off'
-      - condition: state
-        entity_id: light.denver_light
-        state: 'on'
-      - condition: state
-        entity_id: input_boolean.guest_mode
-        state: 'off'
-      - condition: state
-        entity_id: input_boolean.disable_automations
-        state: 'off'
-      - condition: state
-        entity_id: input_boolean.disable_denver_bedroom_motion_automation
-        state: 'off'
-    action:
-      - service: script.text_notify
-        data_template:
-          who: "denver"
-          message: >-
-            Your lights are still on, but I don't detect you in your room, either you aren't there, or more around more - I will turn your lights off in 2 minutes!
+timer:
+  denver_light_timer:
+    duration: "00:05:00"
+    restore: true
+    icon: mdi:timer
+    name: "Denver Light Timer"
 
-  # ----------------------------------------------------------
-  - id: turn_off_denver_bedroom_lights_when_occupancy_cleared
-    alias: Turn OFF Denver's Bedroom lights when occupancy cleared
-    trigger:
-      - platform: state
-        entity_id: binary_sensor.denver_bedroom_occupancy
-        from: 'on'
-        to: 'off'
-        for:
-          hours: 0
-          minutes: 7 # do not use default, Denver does allot of sedetary stuff //"{{ states('input_number.light_timeout') | int }}"
-          seconds: 0
-    condition:
-      - condition: state
-        entity_id: binary_sensor.denver_bedroom_occupancy
-        state: 'off'
+# ----------------------------------------------------------
+# ----------------------------------------------------------
+
+script:
+
+  turn_on_denver_lights:
+    sequence:
+      - condition: and
+        conditions:
+          - condition: state
+            entity_id: light.denver_light
+            state: 'off'
+          - condition: time
+            after: '08:00:00'
+            before: '22:30:00'
+      - service: light.turn_on
+        entity_id: light.denver_light
+
+  turn_off_denver_lights:
+    sequence:
       - condition: state
         entity_id: light.denver_light
         state: 'on'
-      - condition: state
-        entity_id: input_boolean.guest_mode
-        state: 'off'
-      - condition: state
-        entity_id: input_boolean.disable_automations
-        state: 'off'
-      - condition: state
-        entity_id: input_boolean.disable_denver_bedroom_motion_automation
-        state: 'off'
-    action:
       - service: light.turn_off
         entity_id: light.denver_light
+  
+  goodnight_denver:
+    sequence:
+      - condition: state
+        entity_id: light.denver_light
+        state: 'on'
       - service: script.text_notify
         data_template:
           who: "denver"
           message: >-
-            I warned ya - lights are now off.  Good day.
-      
-    mode: single
+            Its 11pm, I will be turning off your lights in 2min.  Goodnight.
+      - delay: "00:02:00"
+      - service: script.turn_off_denver_lights
+
+
 
 # ----------------------------------------------------------
 # ----------------------------------------------------------
+
+automation:
+
+  - id: 'denver_automatic_lights'
+    alias: 'Denver Automatic Lights'
+    description: ''
+    trigger:
+
+      # -------------------------------------------
+      - platform: event
+        event_type: timer.finished
+        event_data:
+          entity_id: timer.denver_light_timer
+        id: Denver Light Timer Finished
+
+      # -------------------------------------------
+      - platform: state
+        entity_id: binary_sensor.denver_bedroom_occupancy
+        from: 'on'
+        to: 'off'
+        id: Denver Occupancy Cleared
+      
+      # -------------------------------------------
+      - platform: state
+        entity_id: binary_sensor.denver_bedroom_occupancy
+        from: 'off'
+        to: 'on'
+        id: Denver Occupancy Detected
+    
+      # -------------------------------------------
+      - platform: time
+        at: "23:00:00"
+        id: Goodnight Denver
+
+    condition:
+      - condition: state
+        entity_id: input_boolean.disable_denver_bedroom_motion_automation
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.guest_mode
+        state: 'off'
+      - condition: state
+        entity_id: input_boolean.disable_automations
+        state: 'off'
+
+    action:
+
+      - choose:
+
+        # -------------------------------------------
+        - conditions:
+          - condition: trigger
+            id: Goodnight Denver
+          sequence:
+            - service: script.goodnight_denver
+        
+        # -------------------------------------------
+        - conditions:
+          - condition: trigger
+            id: Denver Occupancy Cleared
+          sequence:
+          - service: timer.start
+            target:
+              entity_id: timer.denver_light_timer
+        
+        # -------------------------------------------
+        - conditions:
+          - condition: trigger
+            id: Denver Occupancy Detected
+          sequence:
+          - service: timer.cancel
+            data: {}
+            target:
+              entity_id: timer.denver_light_timer
+          # - service: script.turn_on_denver_lights
+        
+        # -------------------------------------------
+        - conditions:
+          - condition: trigger
+            id: Denver Light Timer Finished
+          sequence:
+          - service: script.turn_off_denver_lights
+          
+    mode: single
+

@@ -6,6 +6,7 @@ binary_sensor:
       - binary_sensor.family_room_p1_motion
       - binary_sensor.family_room_secondary_pir
       - binary_sensor.theatre_mode
+      - binary_sensor.people_in_family_room
 
 # ----------------------------------------------------------
 # ----------------------------------------------------------
@@ -28,6 +29,7 @@ group:
       - light.reading_lights_left
       - light.reading_lights_right
 
+
 # ----------------------------------------------------------
 # ----------------------------------------------------------
 
@@ -37,6 +39,13 @@ template:
         icon: mdi:television
         state: >
           {{ is_state('remote.58_hisense_roku_tv', 'on') }}
+      - name: People in Family Room
+        state: >
+          {{ is_state('sensor.kevin_ble', 'theatre')
+            or is_state('sensor.tamara_ble', 'theatre')
+            or is_state('sensor.denver_ble', 'theatre')
+            or is_state('sensor.charles_ble', 'theatre')
+            or is_state('sensor.keaton_ble', 'theatre') }}
 
 # ----------------------------------------------------------
 # ----------------------------------------------------------
@@ -63,9 +72,9 @@ script:
           - condition: time
             after: '07:30:00'
             before: '23:00:00'
-          - condition: numeric_state
-            entity_id: sensor.family_room_p1_motion_illuminance
-            below: 100
+          - condition: state
+            entity_id: binary_sensor.theatre_mode
+            state: 'off'
       - service: switch.turn_on
         entity_id: switch.pot_lights
 
@@ -76,6 +85,19 @@ script:
         state: 'on'
       - service: switch.turn_off
         entity_id: switch.pot_lights
+  
+  start_family_room_timer:
+    sequence:
+      - service: timer.start
+        target:
+          entity_id: timer.family_room_light_timer
+  
+  cancel_family_room_timer:
+    sequence:
+      - service: timer.cancel
+        data: {}
+        target:
+          entity_id: timer.family_room_light_timer
 
 # ----------------------------------------------------------
 # ----------------------------------------------------------
@@ -86,23 +108,28 @@ automation:
     alias: 'Family Room Auotmatic Lights'
     description: ''
     trigger:
-    - platform: event
-      event_type: timer.finished
-      event_data:
-        entity_id: timer.family_room_light_timer
-      id: Family Room Light Timer Finished
-    - platform: state
-      entity_id:
-      - binary_sensor.family_room_occupancy
-      from: 'on'
-      to: 'off'
-      id: Family Room Occupancy Cleared
-    - platform: state
-      entity_id:
-      - binary_sensor.family_room_occupancy
-      from: 'off'
-      to: 'on'
-      id: Family Room Occupancy Detected
+
+      # -------------------------------------------
+      - platform: event
+        event_type: timer.finished
+        event_data:
+          entity_id: timer.family_room_light_timer
+        id: Family Room Light Timer Finished
+      
+      # -------------------------------------------
+      - platform: state
+        entity_id: binary_sensor.family_room_occupancy
+        from: 'on'
+        to: 'off'
+        id: Family Room Occupancy Cleared
+      
+      # -------------------------------------------
+      - platform: state
+        entity_id: binary_sensor.family_room_occupancy
+        from: 'off'
+        to: 'on'
+        id: Family Room Occupancy Detected
+
     condition: 
       - condition: state
         entity_id: input_boolean.guest_mode
@@ -113,27 +140,31 @@ automation:
       - condition: state
         entity_id: input_boolean.disable_family_room_motion_automation
         state: 'off'
+
     action:
-    - choose:
-      - conditions:
-        - condition: trigger
-          id: Family Room Occupancy Cleared
-        sequence:
-        - service: timer.start
-          target:
-            entity_id: timer.family_room_light_timer
-      - conditions:
-        - condition: trigger
-          id: Family Room Occupancy Detected
-        sequence:
-        - service: timer.cancel
-          data: {}
-          target:
-            entity_id: timer.family_room_light_timer
-        - service: script.turn_on_family_room_lights
-      - conditions:
-        - condition: trigger
-          id: Family Room Light Timer Finished
-        sequence:
-        - service: script.turn_off_family_room_lights
+
+      - choose:
+
+        # -------------------------------------------
+        - conditions:
+          - condition: trigger
+            id: Family Room Occupancy Cleared
+          sequence:
+          - service: script.start_family_room_timer
+        
+        # -------------------------------------------
+        - conditions:
+          - condition: trigger
+            id: Family Room Occupancy Detected
+          sequence:
+          - service: script.cancel_family_room_timer
+          - service: script.turn_on_family_room_lights
+        
+        # -------------------------------------------
+        - conditions:
+          - condition: trigger
+            id: Family Room Light Timer Finished
+          sequence:
+          - service: script.turn_off_family_room_lights
+          
     mode: single

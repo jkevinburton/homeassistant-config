@@ -10,6 +10,16 @@ template:
         state: "{{ is_state('remote.remote.58_hisense_roku_tv', 'on') }}"
         icon: mdi:television
 
+group:
+  
+  family_room_ambient_lights:
+    name: Ambient Lights
+    icon: mdi:television-ambient-light
+    entities:
+      - light.wled_family_room
+      - switch.zigbee_light_bars
+
+
 automation:
   # ------------------------------------------------------------
   # Turn ON the TV LEDs when the TV turns ON
@@ -54,7 +64,7 @@ automation:
         to: "off"
     condition:
       - condition: state
-        entity_id: switch.zigbee_light_bars
+        entity_id: group.family_room_ambient_lights
         state: "on"
       - condition: state
         entity_id: input_boolean.guest_mode
@@ -81,7 +91,7 @@ automation:
           entity_id: remote.58_hisense_roku_tv
           state: "on"
         - condition: state
-          entity_id: switch.zigbee_light_bars
+          entity_id: group.family_room_ambient_lights
           state: "off"
         - condition: state
           entity_id: input_boolean.guest_mode
@@ -95,16 +105,16 @@ automation:
 script:
   turn_off_tv_ambient:
     sequence:
-      - service: switch.turn_off
-        entity_id: switch.zigbee_light_bars
+      - service: homeassistant.turn_off
+        entity_id: group.family_room_ambient_lights
   turn_on_tv_ambient:
     sequence:
-      - service: switch.turn_on
-        entity_id: switch.zigbee_light_bars
+      - service: homeassistant.turn_on
+        entity_id: group.family_room_ambient_lights
   turn_on_lamp:
     sequence:
       - condition: state
         entity_id: group.family_room_reading_lights
         state: "off"
-      - service: light.turn_on
+      - service: homeassistant.turn_on
         entity_id: group.family_room_reading_lights
