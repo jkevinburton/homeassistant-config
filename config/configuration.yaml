@@ -1,4 +1,5 @@
 homeassistant:
+  country: CA
   name: Burton House on Gladstone
   unit_system: metric
   time_zone: !secret time_zone
